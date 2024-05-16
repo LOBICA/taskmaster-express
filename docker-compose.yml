@@ -2,8 +2,8 @@ name: "taskmaster-express"
 services:
   api:
     build:
-      context: .
-      dockerfile: ./docker/api.dockerfile
+      context: ./api
+      dockerfile: ../docker/api.dockerfile
       target: app
     ports:
       - 8001:8001
@@ -12,7 +12,7 @@ services:
       - PSQL_CONNECTION_STRING=postgresql+asyncpg://taskmaster:password@db/taskmaster
     command: "sh scripts/launch-api.local.sh"
     volumes:
-      - .:/usr/src/app
+      - ./api:/usr/src/app
     depends_on:
       - db
   lint:
@@ -21,14 +21,14 @@ services:
     command: "sh scripts/lint.sh"
     profiles: [ "test" ]
     volumes:
-      - .:/usr/src/app
+      - ./api:/usr/src/app
   test:
     image: taskmaster-express-api
     env_file: .env
     command: "sh scripts/test.sh"
     profiles: [ "test" ]
     volumes:
-      - .:/usr/src/app
+      - ./api:/usr/src/app
   db:
     image: postgres
     environment:
