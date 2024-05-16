@@ -21,7 +21,7 @@ class TaskMood(Enum):
 
 
 class TaskData(BaseModel):
-    title: str
+    title: str = ""
     description: str = ""
     status: TaskStatus = TaskStatus.PENDING
     due_date: date | None = None
@@ -29,14 +29,14 @@ class TaskData(BaseModel):
 
 
 class Task(TaskData):
-    uuid: UUID
+    uuid: UUID | None = None
 
-    def update(self, new_version: TaskData):
-        self.title = new_version.title
-        self.description = new_version.description
-        self.status = new_version.status
-        self.due_date = new_version.due_date
-        self.mood = new_version.mood
+    def update(self, data: dict):
+        self.title = data.get('title', self.title)
+        self.description = data.get('description', self.description)
+        self.status = data.get('status', self.status)
+        self.due_date = data.get('due_date', self.due_date)
+        self.mood = data.get('mood', self.mood)
 
     class Config:
         orm_mode = True

@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from taskmasterexp.database.dependencies import TaskManager
-from taskmasterexp.schemas.tasks import TaskData, TaskResponse
+from taskmasterexp.schemas.tasks import TaskData, TaskResponse, Task
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -14,9 +14,11 @@ async def list_tasks(manager: TaskManager):
     return tasks
 
 
-@router.post("/", status_code=201)
-async def add_tasks(task: TaskData, manager: TaskManager):
-    await manager.save(task)
+@router.post("/", status_code=201, response_model=TaskResponse)
+async def add_tasks(data: TaskData, manager: TaskManager):
+    task = Task(**data.dict())
+    task = await manager.save(task)
+    return task
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
@@ -29,7 +31,7 @@ async def get_task(task_id: UUID, manager: TaskManager):
 async def modify_task(task_id: UUID, data: TaskData, manager: TaskManager):
     task = await manager.get(task_id)
 
-    task.update(data)
+    task.update(data.dict(exclude_unset=True))
     await manager.save(task)
 
     return task

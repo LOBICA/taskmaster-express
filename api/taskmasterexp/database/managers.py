@@ -12,7 +12,7 @@ class TaskManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def list(self, params: dict) -> list[Task]:
+    async def list(self, params: dict = None) -> list[Task]:
         stmt = select(TaskModel)
         result: Result = await self.session.execute(stmt)
         return [Task.from_orm(model) for model in result.scalars()]
@@ -24,13 +24,15 @@ class TaskManager:
     async def save(self, task: Task) -> None:
         model = await self.session.get(TaskModel, task.uuid)
         if model:
-            for field, value in task.dict():
+            for field, value in task.dict().items():
                 setattr(model, field, value)
         else:
-            model = TaskModel(**task.dict())
+            model = TaskModel(**task.dict(exclude={"uuid"}))
             self.session.add(model)
 
         await self.session.commit()
+        await self.session.refresh(model)
+        return Task.from_orm(model)
 
     async def delete(self, task_id: UUID) -> None:
         model = await self.session.get(TaskModel, task_id)
