@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 
 from . import __version__
+from .endpoints import tasks
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -19,3 +20,6 @@ async def root():
 @app.get("/ping", response_class=PlainTextResponse)
 async def ping():
     return "pong"
+
+
+app.include_router(tasks.router)
