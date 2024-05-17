@@ -17,13 +17,16 @@ class TaskManager:
         result: Result = await self.session.execute(stmt)
         return [Task.from_orm(model) for model in result.scalars()]
 
-    async def get(self, task_id: UUID) -> Task:
+    async def get(self, task_id: UUID) -> Task | None:
         model = await self.session.get(TaskModel, task_id)
-        return Task.from_orm(model)
-
-    async def save(self, task: Task) -> None:
-        model = await self.session.get(TaskModel, task.uuid)
         if model:
+            return Task.from_orm(model)
+
+        return None
+
+    async def save(self, task: Task) -> Task:
+        if task.uuid:
+            model = await self.session.get(TaskModel, task.uuid)
             for field, value in task.dict().items():
                 setattr(model, field, value)
         else:
