@@ -1,8 +1,11 @@
+import json
 from datetime import date
 from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel
+
+from taskmasterexp.encoder import CustomEncoder
 
 
 class TaskStatus(str, Enum):
@@ -32,11 +35,14 @@ class Task(TaskData):
     uuid: UUID | None = None
 
     def update(self, data: dict):
-        self.title = data.get('title', self.title)
-        self.description = data.get('description', self.description)
-        self.status = data.get('status', self.status)
-        self.due_date = data.get('due_date', self.due_date)
-        self.mood = data.get('mood', self.mood)
+        self.title = data.get("title", self.title)
+        self.description = data.get("description", self.description)
+        self.status = data.get("status", self.status)
+        self.due_date = data.get("due_date", self.due_date)
+        self.mood = data.get("mood", self.mood)
+
+    def to_json(self):
+        return json.dumps(self.dict(), cls=CustomEncoder)
 
     class Config:
         orm_mode = True
