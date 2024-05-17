@@ -1,14 +1,13 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from alembic import context
-
-from taskmasterexp.database.models import BaseModel
 from taskmasterexp.database.connection import PSQL_CONNECTION_STRING
+from taskmasterexp.database.models import BaseModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

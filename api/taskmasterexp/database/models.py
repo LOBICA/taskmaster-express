@@ -12,7 +12,9 @@ from taskmasterexp.schemas.tasks import TaskMood, TaskStatus
 class BaseModel(AsyncAttrs, DeclarativeBase):
     uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(default=func.now(), onupdate=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        default=func.now(), onupdate=func.now()
+    )
 
 
 class TaskModel(BaseModel):
