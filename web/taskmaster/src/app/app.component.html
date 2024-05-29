@@ -51,6 +51,7 @@
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
+      <h2>Tasks</h2>
       <mat-selection-list #tasklist>
         @for (task of tasks; track task.uuid) {
           <mat-list-option>
@@ -61,6 +62,8 @@
           <p>There are no tasks</p>
         }
       </mat-selection-list>
+      <h2>New Task</h2>
+      <app-taskform (addTaskEvent)='addTask($event)'/>
     </div>
   </div>
 </main>
