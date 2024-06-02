@@ -19,6 +19,9 @@ import { Task } from './task.model';
     templateUrl: './taskform.component.html'
 })
 export class TaskFormComponent {
+    @Output() addTaskEvent = new EventEmitter<Task>();
+    title = '';
+    description = '';
     addTask() {
         let task = new Task(
             crypto.randomUUID(),
@@ -29,7 +32,4 @@ export class TaskFormComponent {
         this.title = ''
         this.description = ''
     }
-    @Output() addTaskEvent = new EventEmitter<Task>();
-    title = '';
-    description = '';
 }
