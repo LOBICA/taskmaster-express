@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { TaskFormComponent } from './taskform.component';
 import { Task } from './task.model';
+import { TaskService } from './task.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,15 @@ import { Task } from './task.model';
 export class AppComponent {
   title = 'taskmaster';
   tasks = Array<Task>();
+
+  taskService = inject(TaskService);
+
+  constructor() {
+    this.tasks = this.taskService.getTasks()
+  }
+
   addTask(task: Task) {
-    this.tasks.push(task)
+    this.taskService.addTask(task);
+    this.tasks = this.taskService.getTasks();
   }
 }
