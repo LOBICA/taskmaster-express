@@ -13,7 +13,7 @@ export class TaskService {
          return this.http.get<Task[]>('http://localhost:8001/tasks')
     }
 
-    addTask(task: Task) {
-        // pending
+    addTask(task: Task): Observable<Task> {
+        return this.http.post<Task>('http://localhost:8001/tasks', task);
     }
 }
