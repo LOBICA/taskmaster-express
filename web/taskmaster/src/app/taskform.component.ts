@@ -3,7 +3,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button'
-import { FormsModule } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Task } from './task.model';
 
 @Component({
@@ -13,23 +13,24 @@ import { Task } from './task.model';
         MatSelectModule,
         MatInputModule,
         MatFormFieldModule,
-        FormsModule,
+        ReactiveFormsModule,
         MatButtonModule,
     ],
     templateUrl: './taskform.component.html'
 })
 export class TaskFormComponent {
     @Output() addTaskEvent = new EventEmitter<Task>();
-    title = '';
-    description = '';
+    taskForm = new FormGroup({
+        title: new FormControl<string>('', Validators.required),
+        description: new FormControl<string>('')
+    });
     addTask() {
         let task = new Task(
             crypto.randomUUID(),
-            this.title,
-            this.description
+            this.taskForm.value.title!,
+            this.taskForm.value.description
         )
         this.addTaskEvent.emit(task)
-        this.title = ''
-        this.description = ''
+        this.taskForm.reset()
     }
 }

@@ -7,10 +7,10 @@ export class Task {
     mood: string = 'neutral';
 
     public constructor(
-        uuid: string, title: string, description: string
+        uuid: string, title: string, description: string | null | undefined
     ) {
         this.uuid = uuid
         this.title = title
-        this.description = description
+        this.description = description ?? ''
     }
   }
