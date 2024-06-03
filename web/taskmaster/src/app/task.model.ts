@@ -2,9 +2,9 @@ export class Task {
     uuid: string;
     title: string;
     description: string;
-    status: string = 'pending';
+    status = 'pending';
     dueDate: string | null = null;
-    mood: string = 'neutral';
+    mood = 'neutral';
 
     public constructor(
         uuid: string, title: string, description: string | null | undefined

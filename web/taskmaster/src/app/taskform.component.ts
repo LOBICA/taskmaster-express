@@ -25,7 +25,7 @@ export class TaskFormComponent {
         description: new FormControl<string>('')
     });
     addTask() {
-        let task = new Task(
+        const task = new Task(
             crypto.randomUUID(),
             this.taskForm.value.title!,
             this.taskForm.value.description
