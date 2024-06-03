@@ -10,7 +10,6 @@ COPY package-lock.json .
 RUN npm install
 
 FROM req AS code
-WORKDIR /usr/src/app/taskmaster
 COPY . .
 
 FROM code AS app

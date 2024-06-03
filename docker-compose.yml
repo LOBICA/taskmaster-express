@@ -25,7 +25,7 @@ services:
     env_file: .env
     command: "ng serve --host 0.0.0.0"
     volumes:
-      - ./web/taskmaster:/usr/src/app/taskmaster
+      - ./web/taskmaster/src:/usr/src/app/src
     depends_on:
       - api
   lint:
