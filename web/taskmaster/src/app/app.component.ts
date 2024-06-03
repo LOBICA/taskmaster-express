@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { TaskFormComponent } from './taskform.component';
@@ -16,9 +16,7 @@ export class AppComponent {
   title = 'taskmaster';
   tasks = Array<Task>();
 
-  taskService = inject(TaskService);
-
-  constructor() {
+  constructor(private taskService: TaskService) {
     this.loadTasks()
   }
 
