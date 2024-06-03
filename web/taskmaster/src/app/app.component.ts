@@ -19,11 +19,12 @@ export class AppComponent {
   taskService = inject(TaskService);
 
   constructor() {
-    this.tasks = this.taskService.getTasks()
+    this.taskService.getTasks().subscribe(tasks => {
+      this.tasks = tasks
+    })
   }
 
   addTask(task: Task) {
     this.taskService.addTask(task);
-    this.tasks = this.taskService.getTasks();
   }
 }
