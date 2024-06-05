@@ -15,6 +15,19 @@ services:
       - ./api:/usr/src/app
     depends_on:
       - db
+  web:
+    build:
+      context: ./web/taskmaster
+      dockerfile: ../../docker/web.dockerfile
+      target: app
+    ports:
+      - 4200:4200
+    env_file: .env
+    command: "ng serve --host 0.0.0.0 --configuration development"
+    volumes:
+      - ./web/taskmaster/src:/usr/src/app/src
+    depends_on:
+      - api
   lint:
     image: taskmaster-express-api
     env_file: .env
