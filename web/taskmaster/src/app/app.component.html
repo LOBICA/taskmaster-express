@@ -58,7 +58,7 @@
             <mat-card-header><mat-card-title>{{ task.title }}</mat-card-title></mat-card-header>
             <mat-card-content>{{ task.description }}</mat-card-content>
             <mat-card-actions align="end">
-              <button mat-icon-button aria-label="Complete task"><mat-icon>check</mat-icon></button>
+              <button mat-icon-button aria-label="Complete task" (click)="completeTask(task)"><mat-icon>check</mat-icon></button>
               <button mat-icon-button aria-label="Edit task" (click)="openEditor(task)" ><mat-icon>edit</mat-icon></button>
               <button mat-icon-button aria-label="Delete task" (click)="deleteTask(task.uuid)"><mat-icon>delete</mat-icon></button>
             </mat-card-actions>

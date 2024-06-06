@@ -24,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/", response_class=PlainTextResponse)
 async def root():
     return f"Taskmaster Express {__version__}"
