@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,18 +19,40 @@ import { Task } from './task.model';
     templateUrl: './taskform.component.html'
 })
 export class TaskFormComponent {
+    @Input() editableTask: Task | null | undefined
+
     @Output() addTaskEvent = new EventEmitter<Task>();
+    @Output() saveTaskEvent = new EventEmitter<Task>();
+    @Output() cancelEditionEvent = new EventEmitter();
+
     taskForm = new FormGroup({
         title: new FormControl<string>('', Validators.required),
         description: new FormControl<string>('')
     });
+
     addTask() {
-        const task = new Task(
-            crypto.randomUUID(),
-            this.taskForm.value.title!,
-            this.taskForm.value.description
-        )
-        this.addTaskEvent.emit(task)
-        this.taskForm.reset()
+        if (this.taskForm.valid) {
+            if(this.editableTask) {
+                this.editableTask.title = this.taskForm.value.title!
+                this.editableTask.description = this.taskForm.value.description ?? ''
+
+                console.log(this.editableTask)
+
+                this.saveTaskEvent.emit(this.editableTask)
+            }
+            else {
+                const task = new Task(
+                    crypto.randomUUID(),
+                    this.taskForm.value.title!,
+                    this.taskForm.value.description
+                )
+                this.addTaskEvent.emit(task)
+                this.taskForm.reset()
+            }
+        }
+    }
+
+    cancelEdition() {
+        this.cancelEditionEvent.emit()
     }
 }

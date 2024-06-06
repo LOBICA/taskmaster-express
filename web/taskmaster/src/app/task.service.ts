@@ -17,4 +17,16 @@ export class TaskService {
     addTask(task: Task): Observable<Task> {
         return this.http.post<Task>(environment.apiUrl + '/tasks', task);
     }
+
+    getTask(task_id: string): Observable<Task> {
+        return this.http.get<Task>(environment.apiUrl + '/tasks/' + task_id)
+    }
+
+    editTask(task_id: string, task: Task): Observable<Task> {
+        return this.http.patch<Task>( environment.apiUrl + '/tasks/' + task_id, task)
+    }
+
+    deleteTask(task_id: string): Observable<null> {
+        return this.http.delete<null>(environment.apiUrl + '/tasks/' + task_id)
+    }
 }
