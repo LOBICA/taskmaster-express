@@ -10,8 +10,8 @@ import { environment } from "../environments/environment";
 export class TaskService {
     constructor(private http: HttpClient) {}
 
-    getTasks(): Observable<Task[]> {
-         return this.http.get<Task[]>(environment.apiUrl + '/tasks')
+    getTasks(status="pending"): Observable<Task[]> {
+         return this.http.get<Task[]>(environment.apiUrl + '/tasks?status=' + status)
     }
 
     addTask(task: Task): Observable<Task> {

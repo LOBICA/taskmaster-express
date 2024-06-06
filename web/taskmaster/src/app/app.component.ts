@@ -46,6 +46,14 @@ export class AppComponent {
     });
   }
 
+  completeTask(task: Task) {
+    task.status = 'done'
+    this.taskService.editTask(task.uuid, task).subscribe(task => {
+      this.tasks.set(task.uuid, task)
+      this.loadTasks()
+    })
+  }
+
   openEditor(task: Task) {
     this.editableTask = task
   }

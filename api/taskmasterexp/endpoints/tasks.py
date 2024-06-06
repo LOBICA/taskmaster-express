@@ -10,8 +10,16 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("/", response_model=list[TaskResponse])
-async def list_tasks(manager: TaskManager):
-    tasks = await manager.list()
+async def list_tasks(manager: TaskManager, status: str = None):
+    filter = {}
+
+    if status:
+        filter["status"] = status
+
+    if filter:
+        tasks = await manager.list(filter)
+    else:
+        tasks = await manager.list()
     return tasks
 
 
