@@ -74,6 +74,7 @@
       }
       <app-taskform
         [editableTask]="editableTask"
+        [disabled]="formDisabled"
         (addTaskEvent)="addTask($event)"
         (saveTaskEvent)="updateTask($event)"
         (cancelEditionEvent)="cancelEdition()"

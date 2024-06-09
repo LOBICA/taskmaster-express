@@ -1,0 +1,20 @@
+<form [formGroup]="taskForm" (ngSubmit)="addTask(formDirective)" #formDirective="ngForm">
+  <section>
+    <mat-form-field>
+      <mat-label for="title">Title</mat-label>
+      <input matInput id="title" formControlName="title" placeholder="What do you want to do?"/>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label for="description">Description</mat-label>
+      <textarea matInput id="description" formControlName="description"></textarea>
+    </mat-form-field>
+  </section>
+  <button mat-stroked-button type="submit" [disabled]="taskForm.invalid || disabled">
+    {{ !taskInEdition ? "Add" : "Save" }}
+  </button>
+  @if(taskInEdition) { 
+    &nbsp;<button mat-stroked-button type="button" [disabled]="disabled" (click)="cancelEdition()">
+      Cancel
+    </button>
+  }
+</form>
