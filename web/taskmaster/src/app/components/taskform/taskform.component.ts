@@ -53,9 +53,6 @@ export class TaskFormComponent {
       if (this.taskInEdition) {
         this.taskInEdition.title = this.taskForm.value.title!;
         this.taskInEdition.description = this.taskForm.value.description ?? '';
-
-        console.log(this.taskInEdition);
-
         this.saveTaskEvent.emit(this.taskInEdition);
         this.resetFormValues(formDirective);
       } else {
