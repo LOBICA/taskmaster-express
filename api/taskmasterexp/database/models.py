@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
+from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -15,6 +16,22 @@ class BaseModel(AsyncAttrs, DeclarativeBase):
     updated_at: Mapped[datetime] = mapped_column(
         default=func.now(), onupdate=func.now()
     )
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+class UserModel(BaseModel):
+    __tablename__ = "users"
+
+    email: Mapped[str]
+    password: Mapped[str]
+
+    def set_password(self, password: str):
+        self.password = pwd_context.hash(password)
+
+    def verify_password(self, password: str):
+        return pwd_context.verify(password, self.password)
 
 
 class TaskModel(BaseModel):
