@@ -10,6 +10,7 @@ from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
+from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import ALGORITHM, SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -17,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_current_user(
     session: DBSession, token: Annotated[str, Depends(oauth2_scheme)]
-) -> UserModel:
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -40,7 +41,7 @@ async def get_current_user(
     except (MultipleResultsFound, NoResultFound):
         raise credentials_exception
 
-    return user
+    return User.from_orm(user)
 
 
-CurrentUser = Annotated[UserModel, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]

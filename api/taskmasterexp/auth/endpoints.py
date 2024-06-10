@@ -44,4 +44,4 @@ async def get_authentication_token(
 
 @router.get("/users/me", response_model=User)
 async def get_current_user(current_user: CurrentUser):
-    return User.from_orm(current_user)
+    return current_user
