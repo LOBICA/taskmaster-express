@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
 from . import __version__
+from .auth.endpoints import router as auth_endpoints
 from .endpoints import tasks
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -35,4 +36,5 @@ async def ping():
     return "pong"
 
 
+app.include_router(auth_endpoints)
 app.include_router(tasks.router)

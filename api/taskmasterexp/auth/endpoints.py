@@ -5,17 +5,19 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 
-from taskmasterexp.database.dependencies import AsyncSession
+from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
+from taskmasterexp.schemas.users import User
 
+from .dependencies import CurrentUser
 from .token import Token, create_access_token
 
 router = APIRouter(tags=["authentication"])
 
 
-@router.post("/token")
+@router.post("/token", response_model=Token)
 async def get_authentication_token(
-    session: AsyncSession, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: DBSession
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -38,3 +40,8 @@ async def get_authentication_token(
         access_token=access_token,
         token_type="bearer",
     )
+
+
+@router.get("/users/me", response_model=User)
+async def get_current_user(current_user: CurrentUser):
+    return User.from_orm(current_user)
