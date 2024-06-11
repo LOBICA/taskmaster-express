@@ -24,7 +24,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserModel(BaseModel):
     __tablename__ = "users"
 
-    email: Mapped[str]
+    email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
 
     tasks: Mapped[list["TaskModel"]] = relationship(back_populates="user")
