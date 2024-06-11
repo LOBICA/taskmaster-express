@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 import jwt
 from fastapi import Depends, status
@@ -35,7 +36,7 @@ async def get_current_user(
         raise credentials_exception
 
     try:
-        stmt = select(UserModel).where(UserModel.uuid == username)
+        stmt = select(UserModel).where(UserModel.uuid == UUID(username))
         result = await session.execute(stmt)
         user = result.scalar_one()
     except (MultipleResultsFound, NoResultFound):
