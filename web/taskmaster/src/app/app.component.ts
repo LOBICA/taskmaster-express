@@ -84,6 +84,11 @@ export class AppComponent implements OnInit, OnDestroy{
     }
   }
 
+  logout() {
+    localStorage.removeItem('jwt');
+    this.loginService.updateStatus(false);
+  }
+
   addTask(task: Task) {
     if (this.loggedIn) {
       this.formDisabled = true;
