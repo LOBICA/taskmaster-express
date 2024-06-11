@@ -8,6 +8,8 @@ import { TaskService } from './services/task.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { finalize } from 'rxjs';
+import { LoginService } from './services/login.service';
+import { LoginData } from './models/logindata.model';
 
 @Component({
   selector: 'app-root',
@@ -30,13 +32,19 @@ export class AppComponent {
   formDisabled = false;
   loggedIn = false;
 
-  constructor(private taskService: TaskService) {
+  constructor(
+    private taskService: TaskService,
+    private loginService: LoginService,
+  ) {
     this.tasks = new Map<string, Task>();
     this.loadTasks();
   }
 
-  login(loginData: Object) {
-    this.loggedIn = true;
+  login(loginData: LoginData) {
+    this.loginService.login(loginData).subscribe((jwt) => {
+      localStorage.setItem('jwt', jwt.access_token);
+      this.loggedIn = true;
+    });
   }
 
   loadTasks() {
