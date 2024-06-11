@@ -57,7 +57,7 @@ export class TaskFormComponent {
         const task = new Task(
           crypto.randomUUID(),
           this.taskForm.value.title!,
-          this.taskForm.value.description
+          this.taskForm.value.description,
         );
         this.addTaskEvent.emit(task);
         this.resetFormValues(formDirective);

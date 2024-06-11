@@ -40,7 +40,7 @@ export class AppComponent {
   }
 
   loadTasks() {
-    if(this.loggedIn) {
+    if (this.loggedIn) {
       this.formDisabled = true;
       this.taskService
         .getTasks()
@@ -51,24 +51,16 @@ export class AppComponent {
             this.tasks.set(task.uuid, task);
           }
         });
-      } else {
-        const task1 = new Task(
-          crypto.randomUUID(),
-          'Register yourself',
-          '',
-        );
-        this.tasks.set(task1.uuid, task1);
-        const task2 = new Task(
-          crypto.randomUUID(),
-          'Start adding tasks!',
-          '',
-        );
-        this.tasks.set(task2.uuid, task2);
-      }
+    } else {
+      const task1 = new Task(crypto.randomUUID(), 'Register yourself', '');
+      this.tasks.set(task1.uuid, task1);
+      const task2 = new Task(crypto.randomUUID(), 'Start adding tasks!', '');
+      this.tasks.set(task2.uuid, task2);
+    }
   }
 
   addTask(task: Task) {
-    if(this.loggedIn) {
+    if (this.loggedIn) {
       this.formDisabled = true;
       this.taskService
         .addTask(task)
@@ -76,13 +68,13 @@ export class AppComponent {
         .subscribe((task) => {
           this.tasks.set(task.uuid, task);
         });
-      } else {
-        this.tasks.set(task.uuid, task);
-      }
+    } else {
+      this.tasks.set(task.uuid, task);
+    }
   }
 
   completeTask(task: Task) {
-    if(this.loggedIn) {
+    if (this.loggedIn) {
       task.status = 'done';
       this.taskService.editTask(task.uuid, task).subscribe((task) => {
         this.tasks.set(task.uuid, task);
@@ -111,9 +103,9 @@ export class AppComponent {
           this.tasks.set(task.uuid, task);
           this.cancelEdition();
         });
-      } else {
-        this.tasks.set(task.uuid, task);
-      }
+    } else {
+      this.tasks.set(task.uuid, task);
+    }
   }
 
   deleteTask(task_id: string) {
@@ -122,7 +114,7 @@ export class AppComponent {
         this.tasks.delete(task_id);
       });
     } else {
-      this.tasks.delete(task_id)
+      this.tasks.delete(task_id);
     }
   }
 }

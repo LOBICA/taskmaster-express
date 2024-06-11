@@ -1,17 +1,27 @@
 <form [formGroup]="loginForm" (ngSubmit)="login()" #formDirective="ngForm">
-    <section>
-        <mat-form-field>
-            <mat-label for="username">Email</mat-label>
-            <input matInput id="username" formControlName="username"/>
-        </mat-form-field>
-    </section>
-    <section>
-        <mat-form-field>
-            <mat-label for="password">Password</mat-label>
-            <input matInput type="password" id="password" formControlName="password"/>
-        </mat-form-field>
-    </section>
-    <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || disabled">
-        Login
-    </button>
+  <section>
+    <mat-form-field>
+      <mat-label for="username">Email</mat-label>
+      <input matInput id="username" formControlName="username" />
+    </mat-form-field>
+  </section>
+  <section>
+    <mat-form-field>
+      <mat-label for="password">Password</mat-label>
+      <input
+        matInput
+        type="password"
+        id="password"
+        formControlName="password"
+      />
+    </mat-form-field>
+  </section>
+  <button
+    mat-flat-button
+    color="primary"
+    type="submit"
+    [disabled]="loginForm.invalid || disabled"
+  >
+    Login
+  </button>
 </form>

@@ -8,10 +8,9 @@ describe('LoginformComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginformComponent]
-    })
-    .compileComponents();
-    
+      imports: [LoginformComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(LoginformComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
