@@ -42,7 +42,8 @@ export class AppComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
       this.loginService.loginStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
-        this.loggedIn = status
+        this.loggedIn = status;
+        this.loadTasks();
       });
       const storedToken = localStorage.getItem('jwt');
       if (storedToken) {
