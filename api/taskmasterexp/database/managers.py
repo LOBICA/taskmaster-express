@@ -15,6 +15,8 @@ class TaskManager:
     async def list(self, params: dict = None) -> list[Task]:
         stmt = select(TaskModel)
         if params:
+            if "user" in params:
+                stmt = stmt.where(TaskModel.user_id == UUID(params["user_id"]))
             if "status" in params:
                 stmt = stmt.where(TaskModel.status == params["status"])
         result: Result = await self.session.execute(stmt)

@@ -33,6 +33,7 @@ class TaskData(BaseModel):
 
 class Task(TaskData):
     uuid: UUID | None = None
+    user_id: UUID
 
     def update(self, data: dict):
         self.title = data.get("title", self.title)
