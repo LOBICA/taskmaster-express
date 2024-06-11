@@ -129,6 +129,7 @@ export class AppComponent implements OnInit, OnDestroy{
         });
     } else {
       this.tasks.set(task.uuid, task);
+      this.cancelEdition();
     }
   }
 
