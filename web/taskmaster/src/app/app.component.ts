@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { TaskFormComponent } from './components/taskform/taskform.component';
+import { LoginformComponent } from './components/loginform/loginform.component';
 import { Task } from './models/task.model';
 import { TaskService } from './services/task.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +16,7 @@ import { finalize } from 'rxjs';
     RouterOutlet,
     MatCardModule,
     TaskFormComponent,
+    LoginformComponent,
     MatButtonModule,
     MatIconModule,
   ],
@@ -22,7 +24,7 @@ import { finalize } from 'rxjs';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'taskmaster';
+  title = 'Taskmaster';
   tasks: Map<string, Task>;
   editableTask: Task | undefined | null;
   formDisabled = false;
@@ -31,6 +33,10 @@ export class AppComponent {
   constructor(private taskService: TaskService) {
     this.tasks = new Map<string, Task>();
     this.loadTasks();
+  }
+
+  login(loginData: Object) {
+    this.loggedIn = true;
   }
 
   loadTasks() {
