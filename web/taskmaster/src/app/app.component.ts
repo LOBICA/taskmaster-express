@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { TaskFormComponent } from './components/taskform/taskform.component';
@@ -7,7 +7,7 @@ import { Task } from './models/task.model';
 import { TaskService } from './services/task.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { finalize } from 'rxjs';
+import { Subject, finalize, takeUntil } from 'rxjs';
 import { LoginService } from './services/login.service';
 import { LoginData } from './models/logindata.model';
 
@@ -25,25 +25,41 @@ import { LoginData } from './models/logindata.model';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy{
   title = 'Taskmaster';
   tasks: Map<string, Task>;
   editableTask: Task | undefined | null;
   formDisabled = false;
   loggedIn = false;
+  unsubscribe$ = new Subject<void>();
 
   constructor(
     private taskService: TaskService,
     private loginService: LoginService,
   ) {
     this.tasks = new Map<string, Task>();
-    this.loadTasks();
+  }
+
+  ngOnInit(): void {
+      this.loginService.loginStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
+        this.loggedIn = status
+      });
+      const storedToken = localStorage.getItem('jwt');
+      if (storedToken) {
+        this.loginService.updateStatus(true);
+      }
+      this.loadTasks();
+  }
+
+  ngOnDestroy(): void {
+      this.unsubscribe$.next();
+      this.unsubscribe$.complete();
   }
 
   login(loginData: LoginData) {
     this.loginService.login(loginData).subscribe((jwt) => {
       localStorage.setItem('jwt', jwt.access_token);
-      this.loggedIn = true;
+      this.loginService.updateStatus(true);
     });
   }
 
