@@ -26,6 +26,7 @@ export class AppComponent {
   tasks: Map<string, Task>;
   editableTask: Task | undefined | null;
   formDisabled = false;
+  loggedIn = false;
 
   constructor(private taskService: TaskService) {
     this.tasks = new Map<string, Task>();
@@ -33,34 +34,57 @@ export class AppComponent {
   }
 
   loadTasks() {
-    this.formDisabled = true;
-    this.taskService
-      .getTasks()
-      .pipe(finalize(() => (this.formDisabled = false)))
-      .subscribe((tasks) => {
-        this.tasks.clear();
-        for (const task of tasks) {
-          this.tasks.set(task.uuid, task);
-        }
-      });
+    if(this.loggedIn) {
+      this.formDisabled = true;
+      this.taskService
+        .getTasks()
+        .pipe(finalize(() => (this.formDisabled = false)))
+        .subscribe((tasks) => {
+          this.tasks.clear();
+          for (const task of tasks) {
+            this.tasks.set(task.uuid, task);
+          }
+        });
+      } else {
+        const task1 = new Task(
+          crypto.randomUUID(),
+          'Register yourself',
+          '',
+        );
+        this.tasks.set(task1.uuid, task1);
+        const task2 = new Task(
+          crypto.randomUUID(),
+          'Start adding tasks!',
+          '',
+        );
+        this.tasks.set(task2.uuid, task2);
+      }
   }
 
   addTask(task: Task) {
-    this.formDisabled = true;
-    this.taskService
-      .addTask(task)
-      .pipe(finalize(() => (this.formDisabled = false)))
-      .subscribe((task) => {
+    if(this.loggedIn) {
+      this.formDisabled = true;
+      this.taskService
+        .addTask(task)
+        .pipe(finalize(() => (this.formDisabled = false)))
+        .subscribe((task) => {
+          this.tasks.set(task.uuid, task);
+        });
+      } else {
         this.tasks.set(task.uuid, task);
-      });
+      }
   }
 
   completeTask(task: Task) {
-    task.status = 'done';
-    this.taskService.editTask(task.uuid, task).subscribe((task) => {
-      this.tasks.set(task.uuid, task);
-      this.loadTasks();
-    });
+    if(this.loggedIn) {
+      task.status = 'done';
+      this.taskService.editTask(task.uuid, task).subscribe((task) => {
+        this.tasks.set(task.uuid, task);
+        this.loadTasks();
+      });
+    } else {
+      this.tasks.delete(task.uuid);
+    }
   }
 
   openEditor(task: Task) {
@@ -72,19 +96,27 @@ export class AppComponent {
   }
 
   updateTask(task: Task) {
-    this.formDisabled = true;
-    this.taskService
-      .editTask(task.uuid, task)
-      .pipe(finalize(() => (this.formDisabled = false)))
-      .subscribe((task) => {
+    if (this.loggedIn) {
+      this.formDisabled = true;
+      this.taskService
+        .editTask(task.uuid, task)
+        .pipe(finalize(() => (this.formDisabled = false)))
+        .subscribe((task) => {
+          this.tasks.set(task.uuid, task);
+          this.cancelEdition();
+        });
+      } else {
         this.tasks.set(task.uuid, task);
-        this.cancelEdition();
-      });
+      }
   }
 
   deleteTask(task_id: string) {
-    this.taskService.deleteTask(task_id).subscribe(() => {
-      this.tasks.delete(task_id);
-    });
+    if (this.loggedIn) {
+      this.taskService.deleteTask(task_id).subscribe(() => {
+        this.tasks.delete(task_id);
+      });
+    } else {
+      this.tasks.delete(task_id)
+    }
   }
 }
