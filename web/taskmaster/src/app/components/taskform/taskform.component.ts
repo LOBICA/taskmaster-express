@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +15,6 @@ import { Task } from '../../models/task.model';
   selector: 'app-taskform',
   standalone: true,
   imports: [
-    MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
@@ -59,7 +57,7 @@ export class TaskFormComponent {
         const task = new Task(
           crypto.randomUUID(),
           this.taskForm.value.title!,
-          this.taskForm.value.description
+          this.taskForm.value.description,
         );
         this.addTaskEvent.emit(task);
         this.resetFormValues(formDirective);
