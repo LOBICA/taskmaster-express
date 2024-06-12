@@ -60,6 +60,7 @@ export class AppComponent implements OnInit, OnDestroy{
   login(loginData: LoginData) {
     this.loginService.login(loginData).subscribe((jwt) => {
       localStorage.setItem('jwt', jwt.access_token);
+      localStorage.setItem('refresh', jwt.refresh_token);
       this.loginService.updateStatus(true);
     });
   }

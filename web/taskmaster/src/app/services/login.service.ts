@@ -10,6 +10,8 @@ import { LoginData } from '../models/logindata.model';
 })
 export class LoginService {
   loginStatus$ = new Subject<boolean>();
+  tokenRefreshing = false;
+  refreshedToken$ = new Subject<string | null>();
 
   constructor(private http: HttpClient) {}
 
