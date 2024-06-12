@@ -31,7 +31,7 @@ function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerF
 function retrieveToken(request: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const token = localStorage.getItem('jwt');
   const refresh = localStorage.getItem('refresh');
-  const jwtHelper = inject(JwtHelperService);
+  const jwtHelper = new JwtHelperService();
   const tokenExpired = jwtHelper.isTokenExpired(token);
   const loginService = inject(LoginService)
   if (token && refresh) {
