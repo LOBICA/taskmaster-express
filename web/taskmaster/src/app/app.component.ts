@@ -48,8 +48,9 @@ export class AppComponent implements OnInit, OnDestroy{
       const storedToken = localStorage.getItem('jwt');
       if (storedToken) {
         this.loginService.updateStatus(true);
+      } else {
+        this.loadTasks();
       }
-      this.loadTasks();
   }
 
   ngOnDestroy(): void {
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy{
   login(loginData: LoginData) {
     this.loginService.login(loginData).subscribe((jwt) => {
       localStorage.setItem('jwt', jwt.access_token);
+      localStorage.setItem('refresh', jwt.refresh_token);
       this.loginService.updateStatus(true);
     });
   }

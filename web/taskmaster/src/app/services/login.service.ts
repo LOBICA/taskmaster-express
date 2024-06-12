@@ -10,6 +10,8 @@ import { LoginData } from '../models/logindata.model';
 })
 export class LoginService {
   loginStatus$ = new Subject<boolean>();
+  tokenRefreshing = false;
+  refreshedToken$ = new Subject<string | null>();
 
   constructor(private http: HttpClient) {}
 
@@ -24,6 +26,13 @@ export class LoginService {
     return this.http.post<JWT>(environment.apiUrl + '/token', body.toString(), {
       headers
     });
+  }
+
+  getRefreshedToken(refreshToken: string): Observable<JWT> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    return this.http.post<JWT>(environment.apiUrl + '/refresh', { refreshToken })
   }
 
   updateStatus(status: boolean) {

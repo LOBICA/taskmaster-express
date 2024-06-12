@@ -1,12 +1,12 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
-import { Inject } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
+import { inject } from '@angular/core';
+import { Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { LoginService } from '../services/login.service';
 
 export const authenticationInterceptor: HttpInterceptorFn = (req, next) => {
   const url = req.url;
-  if (!url.includes('token')) {
+  if (!url.includes('token') && !url.includes('refresh')) {
     return retrieveToken(req, next).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
@@ -21,7 +21,7 @@ export const authenticationInterceptor: HttpInterceptorFn = (req, next) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
-  const loginService: LoginService = Inject(LoginService);
+  const loginService: LoginService = inject(LoginService);
   localStorage.removeItem('jwt');
   loginService.updateStatus(false);
   return next(request);
@@ -30,11 +30,29 @@ function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerF
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function retrieveToken(request: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const token = localStorage.getItem('jwt');
+  const refresh = localStorage.getItem('refresh');
   const jwtHelper = new JwtHelperService();
+  const loginService = inject(LoginService)
   const tokenExpired = jwtHelper.isTokenExpired(token);
-  if (token) {
+  if (token && refresh) {
     if (tokenExpired) {
-      return handleSessionExpiredError(request, next);
+      if (!loginService.tokenRefreshing) {
+        loginService.tokenRefreshing = true;
+        loginService.refreshedToken$.next(null);
+        return loginService.getRefreshedToken(refresh).pipe(switchMap((credentails) => {
+          loginService.tokenRefreshing = false;
+          localStorage.setItem('jwt', credentails.access_token);
+          localStorage.setItem('refresh', credentails.refresh_token);
+          loginService.refreshedToken$.next(credentails.access_token);
+          return next(appendAccessToken(request));
+        }))
+      } else {
+        return loginService.refreshedToken$.pipe(
+          filter((token) => token !== null),
+          take(1),
+          switchMap(() => next(appendAccessToken(request)))
+        )
+      }
     }
     return next(appendAccessToken(request));
   } else {
