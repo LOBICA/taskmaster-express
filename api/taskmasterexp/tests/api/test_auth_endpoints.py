@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import jwt
 
 from taskmasterexp.auth.token import TokenData, create_access_token
@@ -86,3 +88,40 @@ def test_refresh_token(test_client, test_admin_user, admin_user_password):
         },
     )
     assert response.status_code == 200
+
+
+def test_access_token_cannot_refresh(test_client, test_admin_user, admin_user_password):
+    response = test_client.post(
+        "/token",
+        content=f"username={test_admin_user.email}&password={admin_user_password}",
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+    assert response.status_code == 200
+    json_data = response.json()
+    access_token = json_data["access_token"]
+
+    response = test_client.post(
+        "/refresh",
+        headers={
+            "authorization": f"Bearer {access_token}",
+        },
+    )
+    assert response.status_code == 401
+
+
+def test_expired_token(test_client, test_admin_user):
+    expire_delta = timedelta(minutes=-15)
+    access_token = create_access_token(
+        TokenData.create_with_username(test_admin_user.uuid),
+        expires_delta=expire_delta,
+    )
+
+    response = test_client.get(
+        "/users/me",
+        headers={
+            "authorization": f"Bearer {access_token}",
+        },
+    )
+    assert response.status_code == 401
