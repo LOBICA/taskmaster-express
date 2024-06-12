@@ -11,8 +11,15 @@ from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
 from .dependencies import CurrentUser, oauth2_scheme
-from .helper import get_username_from_token
-from .token import Token, TokenData, create_access_token, create_refresh_token
+from .token import (
+    Token,
+    TokenData,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    get_scopes_from_token,
+    get_username_from_token,
+)
 
 router = APIRouter(tags=["authentication"])
 
@@ -55,11 +62,16 @@ async def refresh_authentication_token(
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
+        detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    username = get_username_from_token(refresh_token)
+    decoded_token = decode_token(refresh_token)
+    username = get_username_from_token(decoded_token)
+    scopes = get_scopes_from_token(decoded_token)
+
+    if "refresh-token" not in scopes:
+        raise credentials_exception
 
     stmt = select(UserModel).where(UserModel.uuid == UUID(username))
     results = await session.execute(stmt)

@@ -12,7 +12,7 @@ from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
-from .helper import get_username_from_token
+from .token import decode_token, get_username_from_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -27,7 +27,7 @@ async def get_current_user(
     )
 
     try:
-        username = get_username_from_token(token)
+        username = get_username_from_token(decode_token(token))
         if not username:
             raise credentials_exception
     except (InvalidTokenError, ValueError):

@@ -50,7 +50,27 @@ def create_refresh_token(data: TokenData, expires_delta: timedelta | None = None
         expire = datetime.now(timezone.utc) + timedelta(
             minutes=REFRESH_TOKEN_EXPIRE_MINUTES,
         )
-    scope = " ".join(data.scopes)
+    scopes = data.scopes.copy()
+    scopes.append("refresh-token")
+    scope = " ".join(scopes)
     to_encode.update({"exp": expire, "scope": scope})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def decode_token(token: str) -> dict:
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+
+def get_username_from_token(decoded_token: dict) -> str:
+    subject: str = decoded_token.get("sub")
+    type, username = subject.split(":")
+    if type == "username":
+        return username
+
+    return None
+
+
+def get_scopes_from_token(decoded_token: dict) -> list:
+    scope: str = decoded_token.get("scope", "")
+    return scope.split()
