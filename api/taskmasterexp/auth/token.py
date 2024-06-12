@@ -11,7 +11,7 @@ from taskmasterexp.settings import (
 )
 
 
-class TokenData(BaseModel):
+class Token(BaseModel):
     sub: str
     scopes: list[str] = []
 
@@ -19,19 +19,34 @@ class TokenData(BaseModel):
     def create_with_username(cls, username):
         return cls(sub=f"username:{username}")
 
+    @classmethod
+    def decode_token(cls, token):
+        data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        scope: str = data.get("scope", "")
+        scopes = scope.split()
+        return cls(scopes=scopes, **data)
+
+    @property
+    def username(self):
+        type, username = self.sub.split(":")
+        if type == "username":
+            return username
+
+        return None
+
 
 class RefreshTokenInput(BaseModel):
     refresh_token: str = Field(alias="refreshToken")
 
 
-class Token(BaseModel):
+class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str | None
     token_type: str
 
 
 def create_access_token(
-    data: TokenData, fresh=True, expires_delta: timedelta | None = None
+    data: Token, fresh=True, expires_delta: timedelta | None = None
 ):
     to_encode = data.dict(exclude={"scopes"})
     if expires_delta:
@@ -46,7 +61,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def create_refresh_token(data: TokenData, expires_delta: timedelta | None = None):
+def create_refresh_token(data: Token, expires_delta: timedelta | None = None):
     to_encode = data.dict(exclude={"scopes"})
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -60,21 +75,3 @@ def create_refresh_token(data: TokenData, expires_delta: timedelta | None = None
     to_encode.update({"exp": expire, "scope": scope})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-def decode_token(token: str) -> dict:
-    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-
-def get_username_from_token(decoded_token: dict) -> str:
-    subject: str = decoded_token.get("sub")
-    type, username = subject.split(":")
-    if type == "username":
-        return username
-
-    return None
-
-
-def get_scopes_from_token(decoded_token: dict) -> list:
-    scope: str = decoded_token.get("scope", "")
-    return scope.split()

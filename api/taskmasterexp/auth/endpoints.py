@@ -4,28 +4,26 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 
 from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
-from .dependencies import CurrentUser, oauth2_scheme
+from .dependencies import CurrentUser
 from .token import (
-    Token,
-    TokenData,
     RefreshTokenInput,
+    Token,
+    TokenResponse,
     create_access_token,
     create_refresh_token,
-    decode_token,
-    get_scopes_from_token,
-    get_username_from_token,
 )
 
 router = APIRouter(tags=["authentication"])
 
 
-@router.post("/token", response_model=Token)
+@router.post("/token", response_model=TokenResponse)
 async def get_authentication_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: DBSession
 ):
@@ -45,18 +43,18 @@ async def get_authentication_token(
     if not user.verify_password(form_data.password):
         raise credentials_exception
 
-    token_data = TokenData.create_with_username(user.uuid)
+    token_data = Token.create_with_username(user.uuid)
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
 
-    return Token(
+    return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",
     )
 
 
-@router.post("/refresh", response_model=Token)
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh_authentication_token(
     refresh_token_input: RefreshTokenInput,
     session: DBSession,
@@ -69,25 +67,26 @@ async def refresh_authentication_token(
 
     refresh_token = refresh_token_input.refresh_token
 
-    decoded_token = decode_token(refresh_token)
-    username = get_username_from_token(decoded_token)
-    scopes = get_scopes_from_token(decoded_token)
-
-    if "refresh-token" not in scopes:
+    try:
+        token = Token.decode_token(refresh_token)
+    except InvalidTokenError:
         raise credentials_exception
 
-    stmt = select(UserModel).where(UserModel.uuid == UUID(username))
+    if "refresh-token" not in token.scopes:
+        raise credentials_exception
+
+    stmt = select(UserModel).where(UserModel.uuid == UUID(token.username))
     results = await session.execute(stmt)
     user = results.scalar_one_or_none()
 
     if not user:
         raise credentials_exception
 
-    token_data = TokenData.create_with_username(user.uuid)
+    token_data = Token.create_with_username(user.uuid)
     access_token = create_access_token(token_data, fresh=False)
     refresh_token = create_refresh_token(token_data)
 
-    return Token(
+    return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",

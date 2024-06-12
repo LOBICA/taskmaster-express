@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from taskmasterexp.app import app
-from taskmasterexp.auth.token import TokenData, create_access_token
+from taskmasterexp.auth.token import Token, create_access_token
 from taskmasterexp.database.dependencies import inject_db_session
 from taskmasterexp.database.managers import TaskManager
 from taskmasterexp.database.models import BaseModel, UserModel
@@ -57,7 +57,7 @@ async def test_admin_user(db_session, admin_user_password):
 
 @pytest.fixture
 def test_admin_token(test_admin_user):
-    token = create_access_token(TokenData.create_with_username(test_admin_user.uuid))
+    token = create_access_token(Token.create_with_username(test_admin_user.uuid))
     return token
 
 

@@ -12,13 +12,13 @@ from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
-from .token import decode_token, get_username_from_token
+from .token import Token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_current_user(
-    session: DBSession, token: Annotated[str, Depends(oauth2_scheme)]
+    session: DBSession, encoded_token: Annotated[str, Depends(oauth2_scheme)]
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -27,14 +27,14 @@ async def get_current_user(
     )
 
     try:
-        username = get_username_from_token(decode_token(token))
-        if not username:
+        token = Token.decode_token(encoded_token)
+        if not token.username:
             raise credentials_exception
     except (InvalidTokenError, ValueError):
         raise credentials_exception
 
     try:
-        stmt = select(UserModel).where(UserModel.uuid == UUID(username))
+        stmt = select(UserModel).where(UserModel.uuid == UUID(token.username))
         result = await session.execute(stmt)
         user = result.scalar_one()
     except (MultipleResultsFound, NoResultFound):
