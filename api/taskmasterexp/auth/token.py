@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from taskmasterexp.settings import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -18,6 +18,10 @@ class TokenData(BaseModel):
     @classmethod
     def create_with_username(cls, username):
         return cls(sub=f"username:{username}")
+
+
+class RefreshTokenInput(BaseModel):
+    refresh_token: str = Field(alias="refreshToken")
 
 
 class Token(BaseModel):

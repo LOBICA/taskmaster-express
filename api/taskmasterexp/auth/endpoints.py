@@ -14,6 +14,7 @@ from .dependencies import CurrentUser, oauth2_scheme
 from .token import (
     Token,
     TokenData,
+    RefreshTokenInput,
     create_access_token,
     create_refresh_token,
     decode_token,
@@ -57,7 +58,7 @@ async def get_authentication_token(
 
 @router.post("/refresh", response_model=Token)
 async def refresh_authentication_token(
-    refresh_token: Annotated[str, Depends(oauth2_scheme)],
+    refresh_token_input: RefreshTokenInput,
     session: DBSession,
 ):
     credentials_exception = HTTPException(
@@ -65,6 +66,8 @@ async def refresh_authentication_token(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    refresh_token = refresh_token_input.refresh_token
 
     decoded_token = decode_token(refresh_token)
     username = get_username_from_token(decoded_token)
