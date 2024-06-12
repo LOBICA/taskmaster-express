@@ -70,8 +70,8 @@ def test_refresh_token(test_client, test_admin_user, admin_user_password):
 
     response = test_client.post(
         "/refresh",
-        headers={
-            "authorization": f"Bearer {refresh_token}",
+        json={
+            "refreshToken": refresh_token,
         },
     )
     assert response.status_code == 200
@@ -104,8 +104,8 @@ def test_access_token_cannot_refresh(test_client, test_admin_user, admin_user_pa
 
     response = test_client.post(
         "/refresh",
-        headers={
-            "authorization": f"Bearer {access_token}",
+        json={
+            "refreshToken": access_token,
         },
     )
     assert response.status_code == 401
