@@ -42,7 +42,8 @@ export class AppComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
       this.loginService.loginStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
-        this.loggedIn = status
+        this.loggedIn = status;
+        this.loadTasks();
       });
       const storedToken = localStorage.getItem('jwt');
       if (storedToken) {
@@ -81,6 +82,11 @@ export class AppComponent implements OnInit, OnDestroy{
       const task2 = new Task(crypto.randomUUID(), 'Start adding tasks!', '');
       this.tasks.set(task2.uuid, task2);
     }
+  }
+
+  logout() {
+    localStorage.removeItem('jwt');
+    this.loginService.updateStatus(false);
   }
 
   addTask(task: Task) {
@@ -129,6 +135,7 @@ export class AppComponent implements OnInit, OnDestroy{
         });
     } else {
       this.tasks.set(task.uuid, task);
+      this.cancelEdition();
     }
   }
 

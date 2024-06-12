@@ -4,6 +4,7 @@
       <h1>{{ title }}</h1>
       @if (loggedIn) {
         <p>Congratulations! Your app is running. 🎉</p>
+        <button mat-stroked-button class="logout-btn" color="secondary" type="submit" (click)="logout()">Logout</button>
       } @else {
         <app-loginform
           [disabled]="formDisabled"
