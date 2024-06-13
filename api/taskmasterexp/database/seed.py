@@ -5,7 +5,7 @@ from .models import UserModel
 
 
 async def seed():
-    user = UserModel(email="admin@example.com")
+    user = UserModel(email="admin@example.com", name="Admin")
     user.set_password("password")
 
     async with get_engine() as engine:
