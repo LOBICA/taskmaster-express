@@ -79,6 +79,7 @@ export class AppComponent implements OnInit, OnDestroy{
           }
         });
     } else {
+      this.tasks.clear();
       const task1 = new Task(crypto.randomUUID(), 'Register yourself', '');
       this.tasks.set(task1.uuid, task1);
       const task2 = new Task(crypto.randomUUID(), 'Start adding tasks!', '');
