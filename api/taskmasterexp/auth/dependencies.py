@@ -1,6 +1,6 @@
 from typing import Annotated
+from uuid import UUID
 
-import jwt
 from fastapi import Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -11,13 +11,14 @@ from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
-from taskmasterexp.settings import ALGORITHM, SECRET_KEY
+
+from .token import Token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_current_user(
-    session: DBSession, token: Annotated[str, Depends(oauth2_scheme)]
+    session: DBSession, encoded_token: Annotated[str, Depends(oauth2_scheme)]
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -26,16 +27,14 @@ async def get_current_user(
     )
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        subject: str = payload.get("sub")
-        type, username = subject.split(":")
-        if type != "username":
+        token = Token.decode_token(encoded_token)
+        if not token.username:
             raise credentials_exception
     except (InvalidTokenError, ValueError):
         raise credentials_exception
 
     try:
-        stmt = select(UserModel).where(UserModel.uuid == username)
+        stmt = select(UserModel).where(UserModel.uuid == UUID(token.username))
         result = await session.execute(stmt)
         user = result.scalar_one()
     except (MultipleResultsFound, NoResultFound):

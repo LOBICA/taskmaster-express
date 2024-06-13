@@ -1,11 +1,11 @@
 from taskmasterexp.database.managers import TaskManager
 
 
-async def test_task_manager(task_factory, task_manager: TaskManager):
+async def test_task_manager(test_admin_user, task_factory, task_manager: TaskManager):
     tasks = await task_manager.list()
     assert tasks == []
 
-    new_task, *_ = task_factory()
+    new_task, *_ = task_factory(test_admin_user)
     task = await task_manager.save(new_task)
     assert task.title == new_task.title
 
