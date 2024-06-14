@@ -22,8 +22,7 @@ export const authenticationInterceptor: HttpInterceptorFn = (req, next) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerFn, loginService: LoginService): Observable<HttpEvent<unknown>> {
-  localStorage.removeItem('jwt');
-  loginService.updateStatus(false);
+  loginService.logout();
   return next(request);
 }
 

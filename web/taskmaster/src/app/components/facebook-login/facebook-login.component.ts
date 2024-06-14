@@ -23,4 +23,10 @@ export class FacebookLoginComponent {
       } 
     });
   }
+
+  logout() {
+    // revoke app permissions to logout completely because FB.logout() doesn't remove FB cookie
+    FB.logout();
+    this.loginService.logout();
+}
 }
