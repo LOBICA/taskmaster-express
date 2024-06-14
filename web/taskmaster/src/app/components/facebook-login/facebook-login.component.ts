@@ -8,9 +8,19 @@ import { LoginService } from '../../services/login.service';
   templateUrl: './facebook-login.component.html',
   styleUrl: './facebook-login.component.scss'
 })
-export class FacebookLoginComponent implements OnInit{
+export class FacebookLoginComponent {
   constructor(private loginService: LoginService){}
 
-  ngOnInit(): void {
+  checkStatus(): void {
+    FB.getLoginStatus(({authResponse}) => {
+      if (authResponse?.accessToken) {
+        this.loginService.apiAuthenticate(authResponse.accessToken)
+          .subscribe((jwt) => {
+            localStorage.setItem('jwt', jwt.access_token);
+            localStorage.setItem('refresh', jwt.refresh_token);
+            this.loginService.updateStatus(true);
+          })      
+      } 
+    });
   }
 }

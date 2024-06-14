@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subject, finalize, takeUntil } from 'rxjs';
 import { LoginService } from './services/login.service';
 import { LoginData } from './models/logindata.model';
+import { FacebookLoginComponent } from './components/facebook-login/facebook-login.component';
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,9 @@ import { LoginData } from './models/logindata.model';
     RouterOutlet,
     MatCardModule,
     TaskFormComponent,
-    LoginformComponent,
     MatButtonModule,
     MatIconModule,
+    FacebookLoginComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
