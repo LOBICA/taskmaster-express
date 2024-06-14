@@ -6,10 +6,7 @@
         <p>Congratulations! Your app is running. 🎉</p>
         <button mat-stroked-button class="logout-btn" color="secondary" type="submit" (click)="logout()">Logout</button>
       } @else {
-        <app-loginform
-          [disabled]="formDisabled"
-          (loginEvent)="login($event)"
-        />
+        <app-facebook-login></app-facebook-login>
       }
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
