@@ -48,3 +48,27 @@ async def get_fb_info(response_url: str) -> FbInfo:
         name=user_info["name"],
         email=user_info["email"],
     )
+
+
+async def get_fb_info_from_token(token: str) -> FbInfo:
+    client = AsyncOAuth2Client(
+        client_id=FB_CLIENT_ID,
+        client_secret=FB_CLIENT_SECRET,
+    )
+    client.token = {
+        "access_token": token,
+        "token_type": "Bearer",
+    }
+    user_info_response = await client.get(
+        "https://graph.facebook.com/me?fields=id,name,email"
+    )
+    user_info_response.raise_for_status()
+
+    user_info = user_info_response.json()
+
+    return FbInfo(
+        token=token,
+        fb_user_id=user_info["id"],
+        name=user_info["name"],
+        email=user_info["email"],
+    )
