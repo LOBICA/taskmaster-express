@@ -8,7 +8,7 @@ services:
       - 8001:8001
     env_file: .env
     environment:
-      - PSQL_CONNECTION_STRING=postgresql+asyncpg://taskmaster:password@db/taskmaster
+      - DATABASE_URL=postgres://taskmaster:password@db/taskmaster
     command: "sh scripts/launch-api.local.sh"
     volumes:
       - ./api:/usr/src/app
