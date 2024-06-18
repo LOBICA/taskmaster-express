@@ -3,8 +3,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: ../docker/api.dockerfile
-      target: app
+      target: dev
     ports:
       - 8001:8001
     env_file: .env
