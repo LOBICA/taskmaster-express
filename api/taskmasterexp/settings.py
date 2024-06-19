@@ -13,3 +13,4 @@ REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv(
 PSQL_CONNECTION_STRING = os.getenv("DATABASE_URL", "").replace(
     "postgres", "postgresql+asyncpg"
 )
+CORS_ORIGINS = [url.strip() for url in os.getenv("CORS_ORIGINS", "").split(",")]
