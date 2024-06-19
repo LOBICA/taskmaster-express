@@ -17,8 +17,7 @@ services:
   web:
     build:
       context: ./web/taskmaster
-      dockerfile: ../../docker/web.dockerfile
-      target: app
+      target: dev
     ports:
       - 4200:4200
     env_file: .env
