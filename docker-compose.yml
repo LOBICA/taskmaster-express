@@ -57,3 +57,6 @@ services:
     environment:
       DOMAINS: 'taskmaster.local -> http://web:4200'
       STAGE: 'local'
+      WEBSOCKET: true
+    depends_on:
+      - web
