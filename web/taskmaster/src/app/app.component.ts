@@ -26,7 +26,7 @@ import { LoginData } from './models/logindata.model';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit, OnDestroy{
-  title = 'Taskmaster';
+  title = 'Help It Done!';
   tasks: Map<string, Task>;
   editableTask: Task | undefined | null;
   formDisabled = false;
