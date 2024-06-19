@@ -14,14 +14,17 @@ export function appInitializer(loginService: LoginService) {
       }(document, 'script', 'facebook-jssdk')
       );
 
+      
       // wait for facebook sdk to initialize before starting the angular app
       window['fbAsyncInit'] = function () {
-          FB.init({
-              appId: environment.facebookAppId,
-              cookie: true,
-              xfbml: true,
-              version: 'v8.0'
-          });
+        FB.init({
+          appId: environment.facebookAppId,
+          xfbml: true,
+          version: 'v8.0'
+        });
+
+        FB.AppEvents.logPageView();
+        
         FB.getLoginStatus(({authResponse}) => {
           if (authResponse?.accessToken) {
               loginService.apiAuthenticate(authResponse.accessToken)

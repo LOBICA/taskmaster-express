@@ -10,8 +10,8 @@ import { LoginService } from '../../services/login.service';
 })
 export class FacebookLoginComponent {
   constructor(private loginService: LoginService){}
-
   checkStatus(): void {
+    console.log('Facebook authentication');
     FB.getLoginStatus(({authResponse}) => {
       if (authResponse?.accessToken) {
         this.loginService.apiAuthenticate(authResponse.accessToken)
@@ -25,7 +25,7 @@ export class FacebookLoginComponent {
   }
 
   logout() {
-    // revoke app permissions to logout completely because FB.logout() doesn't remove FB cookie
+    console.log('Facebook logout');
     FB.logout();
     this.loginService.logout();
 }
