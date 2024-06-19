@@ -49,3 +49,11 @@ services:
       - POSTGRES_USER=taskmaster
     ports:
       - "5432:5432"
+  https-portal:
+    image: steveltn/https-portal
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAINS: 'taskmaster.local -> http://web:4200'
+      STAGE: 'local'
