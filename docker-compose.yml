@@ -3,13 +3,13 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: ../docker/api.dockerfile
-      target: app
+      target: dev
     ports:
       - 8001:8001
     env_file: .env
     environment:
-      - PSQL_CONNECTION_STRING=postgresql+asyncpg://taskmaster:password@db/taskmaster
+      - DATABASE_URL=postgres://taskmaster:password@db/taskmaster
+      - CORS_ORIGINS=http://localhost:4200
     command: "sh scripts/launch-api.local.sh"
     volumes:
       - ./api:/usr/src/app
@@ -18,8 +18,7 @@ services:
   web:
     build:
       context: ./web/taskmaster
-      dockerfile: ../../docker/web.dockerfile
-      target: app
+      target: dev
     ports:
       - 4200:4200
     env_file: .env

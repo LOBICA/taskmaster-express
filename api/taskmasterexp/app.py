@@ -8,18 +8,15 @@ from fastapi.responses import PlainTextResponse
 from . import __version__
 from .auth.endpoints import router as auth_endpoints
 from .endpoints import tasks
+from .settings import CORS_ORIGINS
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 app = FastAPI(title="Taskmaster Express", version=__version__)
 
-origins = [
-    "http://localhost:4200",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
