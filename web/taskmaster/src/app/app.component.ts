@@ -8,6 +8,7 @@ import { LoginService } from './services/login.service';
 import { LoginData } from './models/logindata.model';
 import { FacebookLoginComponent } from './components/facebook-login/facebook-login.component';
 import { TasksComponent } from './components/tasks/tasks.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ import { TasksComponent } from './components/tasks/tasks.component';
     MatMenuModule,
     FacebookLoginComponent,
     TasksComponent,
+    ChatComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

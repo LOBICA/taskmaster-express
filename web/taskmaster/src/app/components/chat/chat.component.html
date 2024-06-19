@@ -1,0 +1,21 @@
+<mat-card class="chat-box">
+  <mat-list>
+    @for (message of messages; track message.uuid) {
+      <mat-list-item>
+        {{ message.sender }}: {{ message.text }}
+      </mat-list-item>
+    }
+  </mat-list>
+</mat-card>
+<mat-form-field class="message-input">
+  <input matInput id="message" type="text" placeholder="Type a message..." (keydown.enter)="sendMessage()" [(ngModel)]="messageInput"/>
+  <button
+    matSuffix
+    mat-icon-button
+    aria-label="send"
+    [disabled]="!messageInput"
+    (click)="sendMessage()"
+  >
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-form-field>
