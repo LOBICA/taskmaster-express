@@ -4,9 +4,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
-import { Message } from '../../models/message.model';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { Message } from '../../models/message.model';
+import { ChatService } from '../../services/chat.service';
 
 
 @Component({
@@ -26,8 +27,17 @@ import { FormsModule } from '@angular/forms';
 })
 export class ChatComponent {
   messageInput: string = '';
-
   messages: Message[] = Array<Message>();
+
+  constructor(private chatService: ChatService) {
+    this.chatService.connect();
+    this.chatService.onMessage().subscribe((event: MessageEvent) => {
+      if (event.data) {
+        const message = JSON.parse(event.data) as Message;
+        this.messages.push(message);
+      }
+    });
+  }
 
   sendMessage(): void {
     if (this.messageInput) {
@@ -38,6 +48,7 @@ export class ChatComponent {
         'user',
       );
       this.messages.push(message);
+      this.chatService.send(message);
       this.messageInput = '';
     }
   }
