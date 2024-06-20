@@ -17,9 +17,7 @@ from .token import Token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_current_user(
-    session: DBSession, encoded_token: Annotated[str, Depends(oauth2_scheme)]
-) -> User:
+async def _get_current_user(session: DBSession, encoded_token: str) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -43,4 +41,16 @@ async def get_current_user(
     return User.from_orm(user)
 
 
+async def get_current_user(
+    session: DBSession, encoded_token: Annotated[str, Depends(oauth2_scheme)]
+) -> User:
+    return await _get_current_user(session, encoded_token)
+
+
+async def get_current_user_ws(session: DBSession, token: str) -> User:
+    return await _get_current_user(session, token)
+
+
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+CurrentUserWS = Annotated[User, Depends(get_current_user_ws)]

@@ -13,7 +13,8 @@ export class ChatService {
   }
 
   public connect(): void {
-    const ws = new WebSocket(environment.apiUrl + '/chat');
+    const token = localStorage.getItem('jwt');
+    const ws = new WebSocket(environment.apiUrl + '/chat/' + token);
 
     this.socket.subscribe({
       next: (data: any) => {
