@@ -6,3 +6,10 @@ export class Message {
         public sender: string,
     ) {}
 }
+
+export class ChatInput {
+    constructor(
+        public message: Message,
+        public history: Message[],
+    ) {}
+}

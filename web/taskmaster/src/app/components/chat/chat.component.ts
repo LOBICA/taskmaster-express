@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { Message } from '../../models/message.model';
+import { Message, ChatInput } from '../../models/message.model';
 import { ChatService } from '../../services/chat.service';
 
 
@@ -49,8 +49,9 @@ export class ChatComponent {
         new Date(),
         this.user,
       );
+      const chatInput = new ChatInput(message, this.messages);
       this.messages.push(message);
-      this.chatService.send(message);
+      this.chatService.send(chatInput);
       this.messageInput = '';
     }
   }
