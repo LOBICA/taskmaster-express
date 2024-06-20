@@ -13,7 +13,7 @@
         }
       </mat-menu>
       @if (loggedIn) {
-        <app-chat />
+        <app-chat [user]="user" />
       } @else {
         <app-facebook-login [loggedIn]="loggedIn"></app-facebook-login>
       }

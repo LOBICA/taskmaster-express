@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -26,6 +26,8 @@ import { ChatService } from '../../services/chat.service';
   ],
 })
 export class ChatComponent {
+  @Input() user: string = 'Guest';
+
   messageInput: string = '';
   messages: Message[] = Array<Message>();
 
@@ -45,7 +47,7 @@ export class ChatComponent {
         crypto.randomUUID(),
         this.messageInput,
         new Date(),
-        'user',
+        this.user,
       );
       this.messages.push(message);
       this.chatService.send(message);
