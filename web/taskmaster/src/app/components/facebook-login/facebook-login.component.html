@@ -1,1 +1,5 @@
-<div class="fb-login-button" data-width="220" data-size="" data-button-type="" data-layout="" data-auto-logout-link="false" data-use-continue-as="false"></div>
+@if(!loggedIn) {
+  <button mat-flat-button color="primary" type="submit" [disabled]="inProgress" (click)="login()">Login</button>
+}@else {
+  <button mat-stroked-button class="logout-btn" color="secondary" type="submit" (click)="logout()">Logout</button>
+}
