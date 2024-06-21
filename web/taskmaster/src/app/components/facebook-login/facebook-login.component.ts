@@ -3,11 +3,12 @@ import { LoginService } from '../../services/login.service';
 import { MatButtonModule } from '@angular/material/button';
 import { EMPTY, Observable, concatMap, finalize, from, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-facebook-login',
   standalone: true,
-  imports: [MatButtonModule, CommonModule],
+  imports: [MatButtonModule, CommonModule, MatIconModule],
   templateUrl: './facebook-login.component.html',
   styleUrl: './facebook-login.component.scss'
 })
