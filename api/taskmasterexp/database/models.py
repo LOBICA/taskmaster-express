@@ -25,7 +25,11 @@ class UserModel(BaseModel):
     __tablename__ = "users"
 
     email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str]
+    password: Mapped[str | None]
+    name: Mapped[str]
+
+    fb_user_id: Mapped[str | None]
+    fb_access_token: Mapped[str | None]
 
     tasks: Mapped[list["TaskModel"]] = relationship(back_populates="user")
 
@@ -33,6 +37,9 @@ class UserModel(BaseModel):
         self.password = pwd_context.hash(password)
 
     def verify_password(self, password: str):
+        if self.password is None:
+            return False
+
         return pwd_context.verify(password, self.password)
 
 

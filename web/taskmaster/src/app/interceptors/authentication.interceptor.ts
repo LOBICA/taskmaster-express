@@ -6,11 +6,12 @@ import { LoginService } from '../services/login.service';
 
 export const authenticationInterceptor: HttpInterceptorFn = (req, next) => {
   const url = req.url;
+  const loginService: LoginService = inject(LoginService);
   if (!url.includes('token') && !url.includes('refresh')) {
     return retrieveToken(req, next).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
-          return handleSessionExpiredError(req, next);
+          return handleSessionExpiredError(req, next, loginService);
         }
         return throwError(() => error);
       })
@@ -20,10 +21,8 @@ export const authenticationInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
-  const loginService: LoginService = inject(LoginService);
-  localStorage.removeItem('jwt');
-  loginService.updateStatus(false);
+function handleSessionExpiredError(request: HttpRequest<any>, next: HttpHandlerFn, loginService: LoginService): Observable<HttpEvent<unknown>> {
+  loginService.logout();
   return next(request);
 }
 

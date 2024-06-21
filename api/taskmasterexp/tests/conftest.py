@@ -47,7 +47,7 @@ def admin_user_password():
 
 @pytest.fixture
 async def test_admin_user(db_session, admin_user_password):
-    user = UserModel(email="admin@example.com")
+    user = UserModel(email="admin@example.com", name="admin")
     user.set_password(admin_user_password)
     db_session.add(user)
     await db_session.commit()

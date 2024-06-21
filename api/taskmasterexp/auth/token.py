@@ -35,6 +35,10 @@ class Token(BaseModel):
         return None
 
 
+class AccessTokenInput(BaseModel):
+    access_token: str = Field(alias="accessToken")
+
+
 class RefreshTokenInput(BaseModel):
     refresh_token: str = Field(alias="refreshToken")
 

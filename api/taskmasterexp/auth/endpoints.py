@@ -1,8 +1,9 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.exceptions import HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
@@ -12,7 +13,9 @@ from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
 from .dependencies import CurrentUser
+from .fb import get_authorization_url, get_fb_info, get_fb_info_from_token
 from .token import (
+    AccessTokenInput,
     RefreshTokenInput,
     Token,
     TokenResponse,
@@ -96,3 +99,80 @@ async def refresh_authentication_token(
 @router.get("/users/me", response_model=User)
 async def get_current_user(current_user: CurrentUser):
     return current_user
+
+
+@router.get("/auth/fb")
+async def facebook_login():
+    authorization_url = await get_authorization_url()
+    return RedirectResponse(url=authorization_url)
+
+
+@router.get("/auth/fb-callback")
+async def fb_callback(session: DBSession, request: Request):
+    fb_info = await get_fb_info(str(request.url))
+    stmt = select(UserModel).where(UserModel.fb_user_id == fb_info.fb_user_id)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        stmt = select(UserModel).where(UserModel.email == fb_info.email)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+
+        if user is None:
+            user = UserModel(
+                name=fb_info.name,
+                email=fb_info.email,
+            )
+            session.add(user)
+
+        user.fb_user_id = fb_info.fb_user_id
+
+    user.fb_access_token = fb_info.token
+    await session.commit()
+
+    token_data = Token.create_with_username(user.uuid)
+    access_token = create_access_token(token_data)
+    refresh_token = create_refresh_token(token_data)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+    )
+
+
+@router.post("/fb_login")
+async def facebok_login(session: DBSession, token: AccessTokenInput):
+    fb_info = await get_fb_info_from_token(token.access_token)
+
+    stmt = select(UserModel).where(UserModel.fb_user_id == fb_info.fb_user_id)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        stmt = select(UserModel).where(UserModel.email == fb_info.email)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+
+        if user is None:
+            user = UserModel(
+                name=fb_info.name,
+                email=fb_info.email,
+            )
+            session.add(user)
+
+        user.fb_user_id = fb_info.fb_user_id
+
+    user.fb_access_token = fb_info.token
+    await session.commit()
+
+    token_data = Token.create_with_username(user.uuid)
+    access_token = create_access_token(token_data)
+    refresh_token = create_refresh_token(token_data)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+    )
