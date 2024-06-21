@@ -15,6 +15,7 @@ app = FastAPI(title="Taskmaster Express", version=__version__)
 
 origins = [
     "http://localhost:4200",
+    "https://taskmaster.local"
 ]
 
 app.add_middleware(
