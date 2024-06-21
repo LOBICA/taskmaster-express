@@ -19,6 +19,7 @@ export function appInitializer(loginService: LoginService) {
       window['fbAsyncInit'] = function () {
         FB.init({
           appId: environment.facebookAppId,
+          cookie: true,
           xfbml: true,
           version: 'v8.0'
         });

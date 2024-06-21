@@ -42,9 +42,10 @@ export class LoginService {
   updateStatus(status: boolean) {
     this.loginStatus$.next(status);
   }
-   logout(): void {
+
+  logout(): void {
     localStorage.removeItem('jwt');
     localStorage.removeItem('refresh');
     this.updateStatus(false);
-   }
+  }
 }
