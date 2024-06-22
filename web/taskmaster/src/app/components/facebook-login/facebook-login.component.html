@@ -1,7 +1,7 @@
 @if(!loggedIn) {
-  <button mat-flat-button class="login-btn" color="primary" type="submit" [disabled]="inProgress" (click)="login()">
+  <button mat-flat-button class="login-btn" style="background-color: #1877F2" type="submit" [disabled]="inProgress" (click)="login()">
     <mat-icon>facebook</mat-icon>
-    Login
+    Login with Facebook
   </button>
 }@else {
   <button mat-stroked-button class="logout-btn" color="secondary" type="submit" (click)="logout()">Logout</button>

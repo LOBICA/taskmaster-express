@@ -17,9 +17,9 @@ FROM code AS dev
 FROM code as build
 RUN ng build
 
-FROM node as prod
+FROM node:20.14-slim as prod
 WORKDIR /usr/src/app
 RUN npm install -g http-server
 
 COPY --from=build /usr/src/app/dist/taskmaster/browser .
-CMD ["sh", "-c", "http-server -p $PORT -d false"]
+CMD ["sh", "-c", "http-server -p $PORT -d false --proxy http://localhost:$PORT?"]

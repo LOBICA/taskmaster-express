@@ -10,7 +10,7 @@ from taskmasterexp.schemas.tasks import Task, TaskData, TaskResponse
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@router.get("/", response_model=list[TaskResponse])
+@router.get("", response_model=list[TaskResponse])
 async def list_tasks(
     current_user: CurrentUser, manager: TaskManager, status: str = None
 ):
@@ -25,7 +25,7 @@ async def list_tasks(
     return tasks
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TaskResponse)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=TaskResponse)
 async def add_tasks(current_user: CurrentUser, manager: TaskManager, data: TaskData):
     task = Task(user_id=current_user.uuid, **data.dict())
     task = await manager.save(task)
