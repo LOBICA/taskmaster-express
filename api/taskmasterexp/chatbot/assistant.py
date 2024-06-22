@@ -22,13 +22,13 @@ async def get_chat_prompt(
     task_data = "[uuid] | [title] | [description] | [status] | [due_date] | [mood]"
 
     task_template = (
-        "[title], [description], due for: [due_date if due_date else 'no due date']"
+        "[title]: [description]"
     )
 
     messages = [
         ("system", "You are a helpful assistant"),
         ("system", "You are helping the user to organize their tasks"),
-        ("system", f"The user name is {user.name}"),
+        ("human", f"My name is {user.name}"),
         ("system", f"The task format is: <{task_data}>"),
         ("system", "Here are the user's current tasks: [{tasks}]"),
         ("system", "You will list the tasks as: <\n1.[title]\n2.[title]\n...>"),
