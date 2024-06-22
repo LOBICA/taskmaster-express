@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class User(BaseModel):
     uuid: UUID
+    name: str
     email: str
 
     class Config:

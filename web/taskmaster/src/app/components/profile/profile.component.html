@@ -1,1 +1,14 @@
-<p>profile works!</p>
+<mat-card class="profile">
+  <mat-card-header>
+    <mat-card-title>Profile</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Name: {{ user?.name }}</p>
+    <p>Email: {{ user?.email }}</p>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    @if (user) {
+      <button mat-stroked-button color="warn">Delete Account</button>
+    }
+  </mat-card-actions>
+</mat-card>
