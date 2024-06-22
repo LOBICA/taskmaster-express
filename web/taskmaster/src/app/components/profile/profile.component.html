@@ -7,8 +7,9 @@
     <p>Email: {{ user?.email }}</p>
   </mat-card-content>
   <mat-card-actions align="end">
+    <a mat-button href="/privacy.html" target="_blank">Privacy Policy</a>
     @if (user) {
-      <button mat-stroked-button color="warn" (click)="deleteAccount()">Delete Account</button>
+      <button mat-button color="warn" (click)="deleteAccount()">Delete Account</button>
     }
   </mat-card-actions>
 </mat-card>

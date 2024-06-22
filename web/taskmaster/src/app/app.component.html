@@ -7,7 +7,6 @@
       </h1>
       <mat-menu #appMenu="matMenu">
         <a mat-menu-item routerLink="/"><mat-icon>home</mat-icon> Home</a>
-        <a mat-menu-item href="/privacy.html" target="_blank"><mat-icon>policy</mat-icon> Privacy Policy</a>
         @if (loggedIn) {
           <a mat-menu-item routerLink="/profile"><mat-icon>account_circle</mat-icon> Profile</a>
           <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>Logout</button>
