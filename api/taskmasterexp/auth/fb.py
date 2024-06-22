@@ -11,7 +11,7 @@ class FbInfo(BaseModel):
     token: str
     fb_user_id: str
     name: str
-    email: str
+    email: str | None
 
 
 async def get_authorization_url() -> str:
@@ -70,5 +70,5 @@ async def get_fb_info_from_token(token: str) -> FbInfo:
         token=token,
         fb_user_id=user_info["id"],
         name=user_info["name"],
-        email=user_info["email"],
+        email=user_info.get("email"),
     )

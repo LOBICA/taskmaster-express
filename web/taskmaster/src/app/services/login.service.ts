@@ -44,6 +44,8 @@ export class LoginService {
   }
 
   logout(): void {
+    FB.api('/me/permissions', 'delete', {}, () => FB.logout());
+    FB.logout();
     localStorage.removeItem('jwt');
     localStorage.removeItem('refresh');
     this.updateStatus(false);
