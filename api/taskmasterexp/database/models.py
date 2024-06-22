@@ -31,7 +31,7 @@ class UserModel(BaseModel):
     fb_user_id: Mapped[str | None]
     fb_access_token: Mapped[str | None]
 
-    tasks: Mapped[list["TaskModel"]] = relationship(back_populates="user")
+    tasks: Mapped[list["TaskModel"]] = relationship(back_populates="user", cascade="all, delete")
 
     def set_password(self, password: str):
         self.password = pwd_context.hash(password)

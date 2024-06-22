@@ -13,4 +13,8 @@ export class UserService {
   getCurrentUser(): Observable<User> {
     return this.http.get<User>(environment.apiUrl + '/users/me');
   }
+
+  deleteCurrentUser(): Observable<void> {
+    return this.http.delete<void>(environment.apiUrl + '/users/me');
+  }
 }

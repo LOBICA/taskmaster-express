@@ -101,6 +101,16 @@ async def get_current_user(current_user: CurrentUser):
     return current_user
 
 
+@router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_current_user(session: DBSession, current_user: CurrentUser):
+    stmt = select(UserModel).where(UserModel.uuid == current_user.uuid)
+    result = await session.execute(stmt)
+    user = result.scalar_one()
+
+    await session.delete(user)
+    await session.commit()
+
+
 @router.get("/auth/fb")
 async def facebook_login():
     authorization_url = await get_authorization_url()
