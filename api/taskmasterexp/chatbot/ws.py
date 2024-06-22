@@ -6,6 +6,9 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, WebSocket
 from pydantic import BaseModel, Field, ValidationError
 
+from taskmasterexp.auth.dependencies import CurrentUserWS
+from taskmasterexp.database.dependencies import TaskManager
+
 from .assistant import ChatPrompt
 
 logger = logging.getLogger(__name__)
@@ -30,7 +33,12 @@ class ChatInput(BaseModel):
 
 
 @router.websocket("/chat/{token}")
-async def chat_endpoint(websocket: WebSocket, prompt: ChatPrompt):
+async def chat_endpoint(
+    websocket: WebSocket,
+    user: CurrentUserWS,
+    task_manager: TaskManager,
+    prompt: ChatPrompt,
+):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
@@ -51,8 +59,18 @@ async def chat_endpoint(websocket: WebSocket, prompt: ChatPrompt):
             logger.error(f"Invalid message: {data}")
             continue
 
+        tasks = await task_manager.list({"user_id": user.uuid})
+        tasks_details = ",".join(
+            [
+                f"{task.uuid} | {task.title} | {task.description} | {task.status} | {task.due_date} | {task.mood}"
+                for task in tasks
+            ]
+        )
+        logger.info(tasks_details)
+
         response = await prompt.ainvoke(
             {
+                "tasks": tasks_details,
                 "history": [
                     (message.message_class, message.text)
                     for message in chat_input.history

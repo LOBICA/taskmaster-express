@@ -3,11 +3,8 @@ from typing import Annotated
 
 from fastapi import Depends
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
-from sqlalchemy import select
 
 from taskmasterexp.auth.dependencies import CurrentUserWS
-from taskmasterexp.database.dependencies import TaskManager
-from taskmasterexp.database.models import TaskModel
 
 from .client import chat_model
 
@@ -18,20 +15,29 @@ human_template = "{text}"
 
 
 async def get_chat_prompt(
-    user: CurrentUserWS, task_manager: TaskManager
+    user: CurrentUserWS,
 ) -> ChatPromptTemplate:
     logger.info(f"Getting chat prompt for user {user.uuid}")
-    tasks = await task_manager.list({"user_id": user.uuid})
 
-    tasks_details = ",".join(
-        [f"{task.title} - {task.description or 'no description'}" for task in tasks]
+    task_data = "[uuid] | [title] | [description] | [status] | [due_date] | [mood]"
+
+    task_template = (
+        "[title], [description], due for: [due_date if due_date else 'no due date']"
     )
 
     messages = [
-        ("system", template),
+        ("system", "You are a helpful assistant"),
         ("system", "You are helping the user to organize their tasks"),
-        ("system", "The task format is: [title] - [description]"),
-        ("system", f"Here are the tasks you have to help with: [{tasks_details}]"),
+        ("system", f"The user name is {user.name}"),
+        ("system", f"The task format is: <{task_data}>"),
+        ("system", "Here are the user's current tasks: [{tasks}]"),
+        ("system", "You will list the tasks as: <\n1.[title]\n2.[title]\n...>"),
+        (
+            "system",
+            f"When giving more details about a tasks you will present them as {task_template}.",
+        ),
+        ("system", "Greet back the user, only provide task information if asked"),
+        ("system", "Always reference the updated list of tasks"),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),
     ]
