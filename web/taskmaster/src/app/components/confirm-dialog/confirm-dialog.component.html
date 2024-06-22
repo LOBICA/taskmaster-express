@@ -5,6 +5,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button class="close-btn" [mat-dialog-close]="false">{{ dialog.buttons.cancelTitle }}</button>
-  <button class="save-btn" [mat-dialog-close]="true" [ngStyle]="{ 'background-color': dialog.buttonColor }">{{ dialog.buttons.confirmTitle }}</button>
+  <button mat-stroked-button class="close-btn" [mat-dialog-close]="false">{{ dialog.buttons.cancelTitle }}</button>
+  <button mat-stroked-button class="save-btn" [mat-dialog-close]="true" [color]="dialog.buttonColor">{{ dialog.buttons.confirmTitle }}</button>
 </mat-dialog-actions>

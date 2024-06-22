@@ -32,13 +32,13 @@ export class ProfileComponent {
   deleteAccount(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete user',
-        description: 'This will delete all information about the current user',
+        title: 'Delete Account',
+        description: 'This will delete all information about your account. This action cannot be reverted. Are you sure you want to proceed?',
         buttons: {
           cancelTitle: 'Cancel',
           confirmTitle: 'Confirm'
         },
-        buttonColor: '#880808'
+        buttonColor: 'warn'
       }
     });
 
