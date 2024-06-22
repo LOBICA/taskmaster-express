@@ -24,14 +24,16 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserModel(BaseModel):
     __tablename__ = "users"
 
-    email: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[str | None] = mapped_column(unique=True)
     password: Mapped[str | None]
     name: Mapped[str]
 
     fb_user_id: Mapped[str | None]
     fb_access_token: Mapped[str | None]
 
-    tasks: Mapped[list["TaskModel"]] = relationship(back_populates="user")
+    tasks: Mapped[list["TaskModel"]] = relationship(
+        back_populates="user", cascade="all, delete"
+    )
 
     def set_password(self, password: str):
         self.password = pwd_context.hash(password)

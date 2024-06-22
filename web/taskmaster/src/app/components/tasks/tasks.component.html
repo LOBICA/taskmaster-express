@@ -1,0 +1,28 @@
+<h2>Tasks</h2>
+<section #tasklist>
+  @for (task of tasks.values(); track task.uuid) {
+    <mat-card class="task-card">
+      <mat-card-header><mat-card-title>{{ task.title }}</mat-card-title></mat-card-header>
+      <mat-card-content>{{ task.description }}</mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-icon-button aria-label="Complete task" (click)="completeTask(task)"><mat-icon>check</mat-icon></button>
+        <button mat-icon-button aria-label="Edit task" (click)="openEditor(task)" ><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button aria-label="Delete task" (click)="deleteTask(task.uuid)"><mat-icon>delete</mat-icon></button>
+      </mat-card-actions>
+    </mat-card>
+  } @empty {
+    <p>There are no tasks</p>
+  }
+</section>
+@if (editableTask) {
+  <h2>Editing {{ editableTask.title }}</h2>
+} @else {
+  <h2>New Task</h2>
+}
+<app-taskform
+  [editableTask]="editableTask"
+  [disabled]="formDisabled"
+  (addTaskEvent)="addTask($event)"
+  (saveTaskEvent)="updateTask($event)"
+  (cancelEditionEvent)="cancelEdition()"
+/>

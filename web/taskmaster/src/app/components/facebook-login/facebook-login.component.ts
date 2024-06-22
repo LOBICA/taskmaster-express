@@ -27,19 +27,16 @@ export class FacebookLoginComponent {
     });
   }
 
-facebookLogin(): Observable<string | undefined> {
-    return from(new Promise<fb.StatusResponse>(resolve => FB.login(resolve))).pipe(concatMap(({ authResponse }) => {
-      if (!authResponse){
-          return EMPTY;
-      };
-      return of(authResponse.accessToken);
-    }));
-}
-
+  facebookLogin(): Observable<string | undefined> {
+      return from(new Promise<fb.StatusResponse>(resolve => FB.login(resolve, {scope: 'email'}))).pipe(concatMap(({ authResponse }) => {
+        if (!authResponse){
+            return EMPTY;
+        };
+        return of(authResponse.accessToken);
+      }));
+  }
 
   logout() {
-    FB.api('/me/permissions', 'delete', {}, () => FB.logout());
-    FB.logout();
     this.loginService.logout();
 }
 }
