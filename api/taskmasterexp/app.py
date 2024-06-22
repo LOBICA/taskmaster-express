@@ -7,6 +7,7 @@ from fastapi.responses import PlainTextResponse
 
 from . import __version__
 from .auth.endpoints import router as auth_endpoints
+from .chatbot.ws import router as chatbot_ws
 from .endpoints import tasks
 from .settings import CORS_ORIGINS
 
@@ -35,3 +36,4 @@ async def ping():
 
 app.include_router(auth_endpoints)
 app.include_router(tasks.router)
+app.include_router(chatbot_ws)

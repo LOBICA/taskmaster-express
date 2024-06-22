@@ -17,3 +17,6 @@ CORS_ORIGINS = [url.strip() for url in os.getenv("CORS_ORIGINS", "").split(",")]
 FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
 FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
 FB_REDIRECT = os.getenv("FB_REDIRECT")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0"))
