@@ -23,6 +23,7 @@ export class FacebookLoginComponent {
     this.inProgress = true;
     const win = window as typeof window & typeof globalThis & { opera: string, MSStream:unknown};
     const userAgent = navigator.userAgent || navigator.vendor || win.opera;
+    console.log(import.meta.env);
 
     if (/android/i.test(userAgent)) {
       window.location.href = 'intent://' + environment.deepLink + '#Intent;package=com.facebook.katana;scheme=fb;end';
