@@ -32,6 +32,7 @@ async def get_chat_agent(
         ("system", f"The task format is: <{task_data}>"),
         ("system", "Here are the user's current tasks: [{tasks}]"),
         ("system", "You will list the tasks as: <\n1.[title]\n2.[title]\n...>"),
+        ("system", "If the task list is empty you will say that there are no tasks"),
         (
             "system",
             f"When giving more details about a tasks you will present them as {task_template}.",
