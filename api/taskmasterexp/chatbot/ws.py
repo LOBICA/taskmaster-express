@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, ValidationError
 from taskmasterexp.auth.dependencies import CurrentUserWS
 from taskmasterexp.database.dependencies import TaskManager
 
-from .assistant import ChatPrompt
+from .assistant import ChatAgent
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ async def chat_endpoint(
     websocket: WebSocket,
     user: CurrentUserWS,
     task_manager: TaskManager,
-    prompt: ChatPrompt,
+    agent: ChatAgent,
 ):
     await websocket.accept()
     while True:
@@ -68,7 +68,7 @@ async def chat_endpoint(
         )
         logger.info(tasks_details)
 
-        response = await prompt.ainvoke(
+        response = await agent.ainvoke(
             {
                 "tasks": tasks_details,
                 "history": [
@@ -76,11 +76,11 @@ async def chat_endpoint(
                     for message in chat_input.history
                 ],
                 "text": chat_input.message.text,
-            }
+            },
         )
 
         response_message = Message(
-            text=response.content,
+            text=response["output"],
             sender="Helper",
         )
         await websocket.send_text(response_message.json())
