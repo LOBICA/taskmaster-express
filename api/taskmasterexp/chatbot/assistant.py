@@ -28,9 +28,9 @@ async def get_chat_agent(
     messages = [
         ("system", "You are a helpful assistant"),
         ("system", "You are helping the user to organize their tasks"),
+        ("system", f"The user's uuid is {user.uuid}"),
         ("human", f"My name is {user.name}"),
         ("system", f"The task format is: <{task_data}>"),
-        ("system", "Here are the user's current tasks: [{tasks}]"),
         ("system", "You will list the tasks as: <\n1.[title]\n2.[title]\n...>"),
         ("system", "If the task list is empty you will say that there are no tasks"),
         (
@@ -43,8 +43,6 @@ async def get_chat_agent(
         MessagesPlaceholder(variable_name="agent_scratchpad"),
         ("human", human_template),
     ]
-
-    logger.info(f"Chat prompt: {messages}")
 
     chat_prompt = ChatPromptTemplate.from_messages(messages)
 
