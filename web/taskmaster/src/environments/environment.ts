@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
     apiUrl: 'https://api.helpitdone.com',
-    facebookAppId: import.meta.env.FB_CLIENT_ID,
-    deepLink: `oauth?client_id=${import.meta.env.FB_CLIENT_ID}&redirect_uri=${import.meta.env.FB_REDIRECT}&scope=email&response_type=token`,
+    facebookAppId: '821367659917526',
+    deepLink: `oauth?client_id=821367659917526&redirect_uri=https://helpitdone.com/auth/fb-callback&scope=email&response_type=token`,
 };

@@ -1,3 +1,3 @@
 const dotnet = require('dotenv');
 
-dotnet.config({ path: '../../../../.env' });
+dotnet.config({ path: '../../.env' });
