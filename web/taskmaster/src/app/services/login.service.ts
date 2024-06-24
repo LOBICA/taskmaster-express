@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { JWT } from '../models/jwt.model';
 import { LoginData } from '../models/logindata.model';
+import { SnackBarService } from './snackBar.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class LoginService {
   tokenRefreshing = false;
   refreshedToken$ = new Subject<string | null>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private snackBarService: SnackBarService) {}
 
   apiAuthenticate(accessToken: string) {
     return this.http.post<JWT>(`${environment.apiUrl}/fb_login`, { accessToken })
@@ -49,5 +50,6 @@ export class LoginService {
     localStorage.removeItem('jwt');
     localStorage.removeItem('refresh');
     this.updateStatus(false);
+    this.snackBarService.openSnackbar('Logout successfull', 'success');
   }
 }
