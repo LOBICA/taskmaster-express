@@ -14,12 +14,9 @@ export function appInitializer(loginService: LoginService) {
         fjs.parentNode?.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk')
     );
-  
-    console.log(import.meta.env);
 
     // wait for facebook sdk to initialize before starting the angular app
     window['fbAsyncInit'] = function () {
-      console.log(environment.facebookAppId);
       FB.init({
         appId: environment.facebookAppId,
         cookie: true,
