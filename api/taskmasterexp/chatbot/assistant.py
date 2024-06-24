@@ -1,26 +1,19 @@
 import logging
-from datetime import datetime
 from typing import Annotated
 
 from fastapi import Depends
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.tools import tool
 
 from taskmasterexp.auth.dependencies import CurrentUserWS
 
 from .client import chat_model
+from .tools import tools
 
 logger = logging.getLogger(__name__)
 
 template = "You are a helpful assistant"
 human_template = "{text}"
-
-
-@tool
-def get_current_time() -> str:
-    """Return the current time in ISO format."""
-    return datetime.now().isoformat()
 
 
 async def get_chat_agent(
@@ -53,8 +46,6 @@ async def get_chat_agent(
     logger.info(f"Chat prompt: {messages}")
 
     chat_prompt = ChatPromptTemplate.from_messages(messages)
-
-    tools = [get_current_time]
 
     agent = create_openai_tools_agent(chat_model, tools, chat_prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
