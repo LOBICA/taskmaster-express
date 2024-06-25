@@ -1,8 +1,11 @@
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 from uuid import UUID
 
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from taskmasterexp.database.connection import get_engine, get_session
 from taskmasterexp.schemas.tasks import Task
 
 from .models import TaskModel
@@ -11,6 +14,13 @@ from .models import TaskModel
 class TaskManager:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    @asynccontextmanager
+    @classmethod
+    async def start_session(cls) -> AsyncGenerator["TaskManager"]:
+        async with get_engine() as engine:
+            async with get_session(engine) as session:
+                yield cls(session)
 
     async def list(self, params: dict = None) -> list[Task]:
         stmt = select(TaskModel)
