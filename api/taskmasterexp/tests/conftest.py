@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -70,6 +72,14 @@ def test_admin_client(test_client: TestClient, test_admin_token):
 @pytest.fixture
 def task_manager(db_session):
     return TaskManager(db_session)
+
+
+@pytest.fixture
+def task_manager_generator(db_session):
+    async def _task_manager_generator():
+        yield TaskManager(db_session)
+
+    return asynccontextmanager(_task_manager_generator)
 
 
 @pytest.fixture

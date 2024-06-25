@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 from uuid import UUID
 
 from sqlalchemy import Result, select
@@ -15,9 +15,9 @@ class TaskManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    @asynccontextmanager
     @classmethod
-    async def start_session(cls) -> AsyncGenerator["TaskManager"]:
+    @asynccontextmanager
+    async def start_session(cls) -> AsyncGenerator[Any, "TaskManager"]:
         async with get_engine() as engine:
             async with get_session(engine) as session:
                 yield cls(session)
