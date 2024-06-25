@@ -24,12 +24,7 @@ async def get_task_list(user_id: str) -> str:
     logger.info(f"Getting task list for user {user_id}")
     async with TaskManager.start_session() as manager:
         tasks = await manager.list({"user_id": UUID(user_id)})
-        tasks_details = ",".join(
-            [
-                f"{task.uuid} | {task.title} | {task.description} | {task.status} | {task.due_date} | {task.mood}"
-                for task in tasks
-            ]
-        )
+        tasks_details = ",".join([task.ai_format() for task in tasks])
         logger.info(tasks_details)
 
     return tasks_details

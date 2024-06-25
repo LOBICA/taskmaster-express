@@ -45,6 +45,31 @@ class Task(TaskData):
     def to_json(self):
         return json.dumps(self.dict(), cls=CustomEncoder)
 
+    @staticmethod
+    def ai_format_template():
+        return " | ".join(
+            [
+                "[uuid]",
+                "[title]",
+                "[description]",
+                "[status]",
+                "[due_date]",
+                "[mood]",
+            ]
+        )
+
+    def ai_format(self):
+        return " | ".join(
+            [
+                str(self.uuid),
+                self.title,
+                self.description,
+                str(self.status.value),
+                str(self.due_date),
+                str(self.mood.value),
+            ]
+        )
+
     class Config:
         orm_mode = True
 
