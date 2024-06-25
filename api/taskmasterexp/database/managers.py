@@ -17,7 +17,7 @@ class TaskManager:
 
     @classmethod
     @asynccontextmanager
-    async def start_session(cls) -> AsyncGenerator[Any, "TaskManager"]:
+    async def start_session(cls) -> AsyncGenerator["TaskManager", Any]:
         async with get_engine() as engine:
             async with get_session(engine) as session:
                 yield cls(session)
