@@ -1,0 +1,7 @@
+<div class="snack-container">
+  @for (snack of snacks; track snack) {
+    <p (click)="closeSelected(snack.id)" [class]="snack.type" (keyup.enter)="closeSelected(snack.id)" tabindex="0">
+      {{ snack.text }}
+    </p>
+  }
+</div>

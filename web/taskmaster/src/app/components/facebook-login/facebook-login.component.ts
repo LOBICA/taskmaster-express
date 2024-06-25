@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { EMPTY, Observable, concatMap, finalize, from, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { SnackBarService } from '../../services/snackBar.service';
 
 @Component({
   selector: 'app-facebook-login',
@@ -16,7 +17,7 @@ export class FacebookLoginComponent {
   @Input() loggedIn!: boolean;
 
   inProgress = false;
-  constructor(private loginService: LoginService){}
+  constructor(private loginService: LoginService, private snackBarService: SnackBarService){}
 
   login() {
     this.inProgress = true;
@@ -24,12 +25,14 @@ export class FacebookLoginComponent {
       localStorage.setItem('jwt', jwt.access_token);
       localStorage.setItem('refresh', jwt.refresh_token);
       this.loginService.updateStatus(true);
+      this.snackBarService.openSnackbar('Login Successfull', 'success');
     });
   }
 
   facebookLogin(): Observable<string | undefined> {
       return from(new Promise<fb.StatusResponse>(resolve => FB.login(resolve, {scope: 'email'}))).pipe(concatMap(({ authResponse }) => {
         if (!authResponse){
+          this.snackBarService.openSnackbar('Login rejected', 'error');
             return EMPTY;
         };
         return of(authResponse.accessToken);
