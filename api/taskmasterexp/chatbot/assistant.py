@@ -39,6 +39,7 @@ async def get_chat_agent(
         ),
         ("system", "Greet back the user, only provide task information if asked"),
         ("system", "Always reference the updated list of tasks"),
+        ("system", "When adding a new task only add the new task once, don't call the tool multiple times"),
         MessagesPlaceholder(variable_name="history"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
         ("human", human_template),
