@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 })
 export class ChatService {
   private socket: Subject<MessageEvent>;
+  public messageReceived$ = new Subject<void>();
 
   constructor() {
     this.socket = new Subject();

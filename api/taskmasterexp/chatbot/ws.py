@@ -6,10 +6,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, WebSocket
 from pydantic import BaseModel, Field, ValidationError
 
-from taskmasterexp.auth.dependencies import CurrentUserWS
-from taskmasterexp.database.dependencies import TaskManager
-
-from .assistant import ChatPrompt
+from .assistant import ChatAgent
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +32,21 @@ class ChatInput(BaseModel):
 @router.websocket("/chat/{token}")
 async def chat_endpoint(
     websocket: WebSocket,
-    user: CurrentUserWS,
-    task_manager: TaskManager,
-    prompt: ChatPrompt,
+    agent: ChatAgent,
 ):
     await websocket.accept()
+
+    response = await agent.ainvoke({
+        "history": [],
+        "text": "Hello",
+    })
+
+    response_message = Message(
+        text=response["output"],
+        sender="Helper",
+    )
+    await websocket.send_text(response_message.json())
+
     while True:
         data = await websocket.receive_text()
         logger.info(f"Received data: {data}")
@@ -59,28 +66,18 @@ async def chat_endpoint(
             logger.error(f"Invalid message: {data}")
             continue
 
-        tasks = await task_manager.list({"user_id": user.uuid})
-        tasks_details = ",".join(
-            [
-                f"{task.uuid} | {task.title} | {task.description} | {task.status} | {task.due_date} | {task.mood}"
-                for task in tasks
-            ]
-        )
-        logger.info(tasks_details)
-
-        response = await prompt.ainvoke(
+        response = await agent.ainvoke(
             {
-                "tasks": tasks_details,
                 "history": [
                     (message.message_class, message.text)
                     for message in chat_input.history
                 ],
                 "text": chat_input.message.text,
-            }
+            },
         )
 
         response_message = Message(
-            text=response.content,
+            text=response["output"],
             sender="Helper",
         )
         await websocket.send_text(response_message.json())
