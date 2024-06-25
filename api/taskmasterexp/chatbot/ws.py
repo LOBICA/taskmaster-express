@@ -35,6 +35,18 @@ async def chat_endpoint(
     agent: ChatAgent,
 ):
     await websocket.accept()
+
+    response = await agent.ainvoke({
+        "history": [],
+        "text": "Hello",
+    })
+
+    response_message = Message(
+        text=response["output"],
+        sender="Helper",
+    )
+    await websocket.send_text(response_message.json())
+
     while True:
         data = await websocket.receive_text()
         logger.info(f"Received data: {data}")

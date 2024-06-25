@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -80,6 +81,13 @@ def task_manager_generator(db_session):
         yield TaskManager(db_session)
 
     return asynccontextmanager(_task_manager_generator)
+
+
+@pytest.fixture
+def patch_task_manager(task_manager_generator):
+    return patch(
+        "taskmasterexp.chatbot.tools.TaskManager.start_session", task_manager_generator
+    )
 
 
 @pytest.fixture
