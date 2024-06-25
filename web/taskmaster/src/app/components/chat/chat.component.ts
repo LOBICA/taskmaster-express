@@ -37,7 +37,7 @@ export class ChatComponent {
       if (event.data) {
         const message = JSON.parse(event.data) as Message;
         this.messages.push(message);
-        this.chatService.messageReceived$.next(true);
+        this.chatService.messageReceived$.next();
       }
     });
   }
