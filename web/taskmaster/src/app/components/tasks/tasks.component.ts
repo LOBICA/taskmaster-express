@@ -7,6 +7,7 @@ import { TaskFormComponent } from '../taskform/taskform.component';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 import { LoginService } from '../../services/login.service';
+import { ChatService } from '../../services/chat.service';
 
 @Component({
   selector: 'app-tasks',
@@ -31,6 +32,7 @@ export class TasksComponent {
   constructor(
     private taskService: TaskService,
     private loginService: LoginService,
+    private chatService: ChatService,
   ) {
     this.tasks = new Map<string, Task>();
   }
@@ -38,6 +40,9 @@ export class TasksComponent {
   ngOnInit(): void {
     this.loginService.loginStatus$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
       this.loggedIn = status;
+      this.loadTasks();
+    });
+    this.chatService.messageReceived$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.loadTasks();
     });
     const storedToken = localStorage.getItem('jwt');
