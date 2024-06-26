@@ -15,7 +15,8 @@ COPY . .
 FROM code AS dev
 
 FROM code as build
-RUN ng build
+ARG ENV=prod
+RUN ng build --configuration $ENV
 
 FROM node:20.14-slim as prod
 WORKDIR /usr/src/app
