@@ -8,7 +8,6 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatCardModule } from '@angular/material/card';
 import { EMPTY, catchError, finalize } from 'rxjs';
 import { LoginData } from '../../models/logindata.model';
 import { SnackBarService } from '../../services/snackBar.service';
@@ -22,7 +21,6 @@ import { LoginService } from '../../services/login.service';
     MatInputModule,
     MatFormFieldModule,
     MatButtonModule,
-    MatCardModule,
   ],
   templateUrl: './loginform.component.html',
   styleUrl: './loginform.component.scss',
