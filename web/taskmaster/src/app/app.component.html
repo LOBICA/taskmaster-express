@@ -15,6 +15,7 @@
       @if (loggedIn) {
         <app-chat [user]="user" />
       } @else {
+        <app-loginform />
         <app-facebook-login [loggedIn]="loggedIn"></app-facebook-login>
       }
     </div>

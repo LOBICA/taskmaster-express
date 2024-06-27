@@ -25,7 +25,7 @@ export class FacebookLoginComponent {
       localStorage.setItem('jwt', jwt.access_token);
       localStorage.setItem('refresh', jwt.refresh_token);
       this.loginService.updateStatus(true);
-      this.snackBarService.openSnackbar('Login Successfull', 'success');
+      this.snackBarService.openSnackbar('Login Successful', 'success');
     });
   }
 

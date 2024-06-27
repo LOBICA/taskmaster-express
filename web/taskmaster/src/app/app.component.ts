@@ -10,6 +10,7 @@ import { FacebookLoginComponent } from './components/facebook-login/facebook-log
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { UserService } from './services/user.service';
+import { LoginformComponent } from './components/loginform/loginform.component';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { UserService } from './services/user.service';
     FacebookLoginComponent,
     TasksComponent,
     ChatComponent,
+    LoginformComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
