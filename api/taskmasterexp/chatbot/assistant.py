@@ -39,10 +39,9 @@ async def get_chat_agent(
         ),
         ("system", "Greet back the user, only provide task information if asked"),
         ("system", "Always reference the updated list of tasks"),
-        ("system", "Only call the add_new_task tool once per chain"),
         MessagesPlaceholder(variable_name="history"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
         ("human", human_template),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
     ]
     logger.info(messages)
 
