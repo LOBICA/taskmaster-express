@@ -24,10 +24,12 @@ async def get_task_list(user_id: str) -> str:
     """
     logger.info(f"Getting task list for user {user_id}")
     async with TaskManager.start_session() as manager:
-        tasks = await manager.list({
-            "user_id": UUID(user_id),
-            "status": TaskStatus.PENDING,
-        })
+        tasks = await manager.list(
+            {
+                "user_id": UUID(user_id),
+                "status": TaskStatus.PENDING,
+            }
+        )
         tasks_details = ",".join([task.ai_format() for task in tasks])
         logger.info(tasks_details)
 

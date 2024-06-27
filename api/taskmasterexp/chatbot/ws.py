@@ -36,10 +36,12 @@ async def chat_endpoint(
 ):
     await websocket.accept()
 
-    response = await agent.ainvoke({
-        "history": [],
-        "text": "Hello",
-    })
+    response = await agent.ainvoke(
+        {
+            "history": [],
+            "text": "Hello",
+        }
+    )
 
     response_message = Message(
         text=response["output"],
