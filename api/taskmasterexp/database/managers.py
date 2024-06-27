@@ -37,7 +37,7 @@ class UserManager(BaseManager):
 
         return None
 
-    async def save(self, user: User) -> User:
+    async def save(self, user: User, password: str = None) -> User:
         if user.uuid:
             model = await self.session.get(UserModel, user.uuid)
             for field, value in user.dict().items():
@@ -45,6 +45,9 @@ class UserManager(BaseManager):
         else:
             model = UserModel(**user.dict(exclude={"uuid"}))
             self.session.add(model)
+
+        if password:
+            model.set_password(password)
 
         await self.session.commit()
         await self.session.refresh(model)

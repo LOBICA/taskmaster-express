@@ -21,3 +21,10 @@ async def inject_task_manager(session: DBSession):
 
 
 TaskManager = Annotated[managers.TaskManager, Depends(inject_task_manager)]
+
+
+async def inject_user_manager(session: DBSession):
+    return managers.UserManager(session)
+
+
+UserManager = Annotated[managers.UserManager, Depends(inject_user_manager)]
