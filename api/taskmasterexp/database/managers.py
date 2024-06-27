@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Self
 from uuid import UUID
 
 from sqlalchemy import Result, select
@@ -7,21 +7,57 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from taskmasterexp.database.connection import get_engine, get_session
 from taskmasterexp.schemas.tasks import Task
+from taskmasterexp.schemas.users import User
 
-from .models import TaskModel
+from .models import TaskModel, UserModel
 
 
-class TaskManager:
+class BaseManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
     @classmethod
     @asynccontextmanager
-    async def start_session(cls) -> AsyncGenerator["TaskManager", Any]:
+    async def start_session(cls) -> AsyncGenerator[Self, Any]:
         async with get_engine() as engine:
             async with get_session(engine) as session:
                 yield cls(session)
 
+
+class UserManager(BaseManager):
+    async def list(self) -> list[User]:
+        stmt = select(UserModel)
+        result: Result = await self.session.execute(stmt)
+        return [User.from_orm(model) for model in result.scalars()]
+
+    async def get(self, user_id: UUID) -> User | None:
+        model = await self.session.get(UserModel, user_id)
+        if model:
+            return User.from_orm(model)
+
+        return None
+
+    async def save(self, user: User) -> User:
+        if user.uuid:
+            model = await self.session.get(UserModel, user.uuid)
+            for field, value in user.dict().items():
+                setattr(model, field, value)
+        else:
+            model = UserModel(**user.dict(exclude={"uuid"}))
+            self.session.add(model)
+
+        await self.session.commit()
+        await self.session.refresh(model)
+        return User.from_orm(model)
+
+    async def delete(self, user_id: UUID) -> None:
+        model = await self.session.get(UserModel, user_id)
+        if model:
+            await self.session.delete(model)
+            await self.session.commit()
+
+
+class TaskManager(BaseManager):
     async def list(self, params: dict = None) -> list[Task]:
         stmt = select(TaskModel)
         if params:
