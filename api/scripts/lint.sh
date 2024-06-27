@@ -1,3 +1,3 @@
-poetry run flake8 .
-poetry run isort --check .
-poetry run black --check .
+flake8 .
+isort --check .
+black --check .
