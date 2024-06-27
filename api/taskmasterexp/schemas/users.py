@@ -10,3 +10,9 @@ class User(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserRegisterInput(BaseModel):
+    name: str
+    email: str
+    password: str
