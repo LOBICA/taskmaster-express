@@ -63,7 +63,7 @@ export class LoginformComponent {
       },
       error: () => {
         this.snackBarService.openSnackbar('Login Failed', 'error');
-        this.analytics.trackEvent('Login Failed', 'User field to login', 'AUTH');
+        this.analytics.trackEvent('Login Failed', 'User failed to login', 'AUTH');
       },
     });
   }
