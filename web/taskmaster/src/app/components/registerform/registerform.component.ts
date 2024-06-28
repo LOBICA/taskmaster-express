@@ -3,7 +3,7 @@ import { FormControl, FormGroup, FormGroupDirective, ReactiveFormsModule, Valida
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { EMPTY, catchError } from 'rxjs';
+import { finalize } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { SnackBarService } from '../../services/snackBar.service';
 import { User } from '../../models/user.model';
@@ -44,15 +44,17 @@ export class RegisterformComponent {
     this.disabled = true;
 
     this.userService.registerUser(user).pipe(
-      catchError(() => {
+    finalize(() => {
+      this.disabled = false;
+    })).subscribe({
+      next: () => {
+        this.snackBarService.openSnackbar('Registration Successful', 'success');
+        this.registerForm.reset();
+        formDirective.resetForm();
+      },
+      error: () => {
         this.snackBarService.openSnackbar('Registration Failed', 'error');
-        return EMPTY;
-      })
-    ).subscribe(() => {
-      this.disabled = false
-      this.snackBarService.openSnackbar('Registration Successful', 'success');
-      this.registerForm.reset();
-      formDirective.resetForm();
+      },
     });
   }
 }

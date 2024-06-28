@@ -8,7 +8,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { EMPTY, catchError, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { LoginData } from '../../models/logindata.model';
 import { SnackBarService } from '../../services/snackBar.service';
 import { LoginService } from '../../services/login.service';
@@ -47,15 +47,16 @@ export class LoginformComponent {
     this.loginService.login(loginData).pipe(
     finalize(() => {
       this.disabled = false;
-    }),
-    catchError(error => {
-      this.snackBarService.openSnackbar('Login Failed', 'error');
-      return EMPTY;
-    })).subscribe((jwt) => {
-      localStorage.setItem('jwt', jwt.access_token);
-      localStorage.setItem('refresh', jwt.refresh_token);
-      this.loginService.updateStatus(true);
-      this.snackBarService.openSnackbar('Login Successful', 'success');
+    })).subscribe({
+      next: (jwt) => {
+        localStorage.setItem('jwt', jwt.access_token);
+        localStorage.setItem('refresh', jwt.refresh_token);
+        this.loginService.updateStatus(true);
+        this.snackBarService.openSnackbar('Login Successful', 'success');
+      },
+      error: () => {
+        this.snackBarService.openSnackbar('Login Failed', 'error');
+      },
     });
   }
 }
