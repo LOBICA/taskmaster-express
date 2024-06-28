@@ -59,9 +59,11 @@ export class LoginformComponent {
         localStorage.setItem('refresh', jwt.refresh_token);
         this.loginService.updateStatus(true);
         this.snackBarService.openSnackbar('Login Successful', 'success');
+        this.analytics.trackEvent('Login Success', 'User successfully logged in', 'AUTH');
       },
       error: () => {
         this.snackBarService.openSnackbar('Login Failed', 'error');
+        this.analytics.trackEvent('Login Failed', 'User field to login', 'AUTH');
       },
     });
   }
