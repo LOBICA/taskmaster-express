@@ -47,5 +47,5 @@ def change_user_password(user_id):
 cli.add_command(change_user_password)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
