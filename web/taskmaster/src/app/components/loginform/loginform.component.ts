@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { finalize } from 'rxjs';
 import { LoginData } from '../../models/logindata.model';
+import { AnalyticsService } from '../../services/analytics.service';
 import { SnackBarService } from '../../services/snackBar.service';
 import { LoginService } from '../../services/login.service';
 
@@ -32,11 +33,16 @@ export class LoginformComponent {
     username: new FormControl<string>('', Validators.required),
     password: new FormControl<string>('', Validators.required),
   });
-
+  
   constructor(
     private loginService: LoginService,
     private snackBarService: SnackBarService,
+    private analytics: AnalyticsService
   ) {}
+  
+  ngOnInit(): void {
+    this.analytics.trackEvent('Login Form', 'User reached the login form', 'AUTH');
+  }
 
   login() {
     const loginData = new LoginData(
@@ -53,9 +59,11 @@ export class LoginformComponent {
         localStorage.setItem('refresh', jwt.refresh_token);
         this.loginService.updateStatus(true);
         this.snackBarService.openSnackbar('Login Successful', 'success');
+        this.analytics.trackEvent('Login Success', 'User successfully logged in', 'AUTH');
       },
       error: () => {
         this.snackBarService.openSnackbar('Login Failed', 'error');
+        this.analytics.trackEvent('Login Failed', 'User failed to login', 'AUTH');
       },
     });
   }
