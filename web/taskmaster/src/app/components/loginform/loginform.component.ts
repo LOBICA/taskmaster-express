@@ -12,7 +12,6 @@ import { finalize } from 'rxjs';
 import { LoginData } from '../../models/logindata.model';
 import { SnackBarService } from '../../services/snackBar.service';
 import { LoginService } from '../../services/login.service';
-import { MatchValue } from '../../utils/match-value.validator';
 
 @Component({
   selector: 'app-loginform',
@@ -32,9 +31,6 @@ export class LoginformComponent {
   loginForm = new FormGroup({
     username: new FormControl<string>('', Validators.required),
     password: new FormControl<string>('', Validators.required),
-    confirmPassword: new FormControl<string>('', Validators.required)
-  }, {
-    validators: MatchValue('password', 'confirmPassword')
   });
 
   constructor(
