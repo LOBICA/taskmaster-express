@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from taskmasterexp.database.managers import UserManager
+from taskmasterexp.database.models import UserModel
 
 
 def test_user_information(test_admin_client, test_admin_user):
@@ -25,6 +26,37 @@ async def test_register_user(test_client, user_manager: UserManager):
     user = await user_manager.get(UUID(json_data["uuid"]))
     assert user is not None
     assert user.email == user_data["email"]
+
+
+async def test_change_password(
+    test_admin_client, admin_user_password, test_admin_user, db_session
+):
+    user: UserModel = await db_session.get(UserModel, test_admin_user.uuid)
+    assert user.verify_password(admin_user_password)
+
+    new_password = "654321"
+    response = test_admin_client.post(
+        "/users/me/password",
+        json={
+            "password": admin_user_password,
+            "newPassword": new_password,
+        },
+    )
+    assert response.status_code == 204
+
+    await db_session.refresh(user)
+    assert user.verify_password(admin_user_password) is False
+    assert user.verify_password(new_password)
+
+    new_password = "654321"
+    response = test_admin_client.post(
+        "/users/me/password",
+        json={
+            "password": admin_user_password,
+            "newPassword": new_password,
+        },
+    )
+    assert response.status_code == 401
 
 
 async def test_delete_user(

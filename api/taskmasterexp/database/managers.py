@@ -53,6 +53,17 @@ class UserManager(BaseManager):
         await self.session.refresh(model)
         return User.from_orm(model)
 
+    async def change_password(
+        self, user_id: UUID, password: str, new_password: str
+    ) -> None:
+        model = await self.session.get(UserModel, user_id)
+        if model:
+            if model.verify_password(password):
+                model.set_password(new_password)
+                await self.session.commit()
+            else:
+                raise ValueError("Invalid password")
+
     async def delete(self, user_id: UUID) -> None:
         model = await self.session.get(UserModel, user_id)
         if model:

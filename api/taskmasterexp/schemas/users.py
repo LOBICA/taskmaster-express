@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserData(BaseModel):
@@ -22,3 +22,8 @@ class UserRegisterInput(UserData):
 
 class UserResponse(UserData):
     uuid: UUID
+
+
+class PasswordInput(BaseModel):
+    password: str
+    new_password: str = Field(alias="newPassword")

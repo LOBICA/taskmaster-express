@@ -1,8 +1,13 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
 from taskmasterexp.auth.dependencies import CurrentUser
 from taskmasterexp.database.dependencies import UserManager
-from taskmasterexp.schemas.users import User, UserRegisterInput, UserResponse
+from taskmasterexp.schemas.users import (
+    PasswordInput,
+    User,
+    UserRegisterInput,
+    UserResponse,
+)
 
 router = APIRouter(tags=["users"], prefix="/users")
 
@@ -22,3 +27,17 @@ async def register_user(manager: UserManager, user: UserRegisterInput):
     new_user = User(**user.dict(exclude={"password"}))
     user = await manager.save(new_user, user.password)
     return user
+
+
+@router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    manager: UserManager,
+    current_user: CurrentUser,
+    data: PasswordInput,
+):
+    try:
+        await manager.change_password(
+            current_user.uuid, data.password, data.new_password
+        )
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
