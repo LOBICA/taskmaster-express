@@ -15,6 +15,18 @@
         formControlName="password"
       />
     </mat-form-field>
+    <mat-form-field>
+      <mat-label for="confirm-password">Confirm Password</mat-label>
+      <input
+        matInput
+        type="password"
+        id="confirm-password"
+        formControlName="confirmPassword"
+      />
+    </mat-form-field>
+    @if (formDirective.errors?.matchValue) {
+      <mat-error>Passwords must match</mat-error>
+    }
   </section>
   <button
     mat-flat-button
