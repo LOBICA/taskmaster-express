@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { SnackBarService } from '../../services/snackBar.service';
 import { User } from '../../models/user.model';
+import { MatchValue } from '../../utils/match-value.validator';
 
 @Component({
   selector: 'app-registerform',
@@ -27,6 +28,9 @@ export class RegisterformComponent {
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
     password: new FormControl<string>('', Validators.required),
+    confirmPassword: new FormControl<string>('', Validators.required)
+  }, {
+    validators: MatchValue('password', 'confirmPassword')
   });
 
   constructor(
