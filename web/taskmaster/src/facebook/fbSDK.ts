@@ -5,9 +5,9 @@ export function appInitializer(loginService: LoginService) {
   return () => new Promise<void>(resolve => {
       // load facebook sdk script
       (function(d, s, id){
-        let js, fjs = d.getElementsByTagName(s)[0];
+        const fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {return;}
-        js = d.createElement(s) as HTMLElement & { src: string };
+        const js = d.createElement(s) as HTMLElement & { src: string };
         js.id = id;
         js.src = "https://connect.facebook.net/en_US/sdk.js";
         fjs.parentNode?.insertBefore(js, fjs);

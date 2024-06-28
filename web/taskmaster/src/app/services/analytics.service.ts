@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const gtag: any;
 
 @Injectable({

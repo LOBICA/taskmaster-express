@@ -26,9 +26,9 @@ import { ChatService } from '../../services/chat.service';
   ],
 })
 export class ChatComponent {
-  @Input() user: string = 'Guest';
+  @Input() user = 'Guest';
 
-  messageInput: string = '';
+  messageInput = '';
   messages: Message[] = Array<Message>();
 
   constructor(private chatService: ChatService) {

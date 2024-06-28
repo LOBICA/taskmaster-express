@@ -34,9 +34,6 @@ export class LoginService {
   }
 
   getRefreshedToken(refreshToken: string): Observable<JWT> {
-    let headers = new HttpHeaders();
-    headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
-
     return this.http.post<JWT>(environment.apiUrl + '/refresh', { refreshToken })
   }
 
