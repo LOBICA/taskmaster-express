@@ -10,9 +10,7 @@ from sqlalchemy import select
 
 from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
-from taskmasterexp.schemas.users import User
 
-from .dependencies import CurrentUser
 from .fb import get_authorization_url, get_fb_info, get_fb_info_from_token
 from .token import (
     AccessTokenInput,
@@ -94,21 +92,6 @@ async def refresh_authentication_token(
         refresh_token=refresh_token,
         token_type="bearer",
     )
-
-
-@router.get("/users/me", response_model=User)
-async def get_current_user(current_user: CurrentUser):
-    return current_user
-
-
-@router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_current_user(session: DBSession, current_user: CurrentUser):
-    stmt = select(UserModel).where(UserModel.uuid == current_user.uuid)
-    result = await session.execute(stmt)
-    user = result.scalar_one()
-
-    await session.delete(user)
-    await session.commit()
 
 
 @router.get("/auth/fb")

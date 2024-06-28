@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from taskmasterexp.app import app
 from taskmasterexp.auth.token import Token, create_access_token
 from taskmasterexp.database.dependencies import inject_db_session
-from taskmasterexp.database.managers import TaskManager
+from taskmasterexp.database.managers import TaskManager, UserManager
 from taskmasterexp.database.models import BaseModel, UserModel
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
@@ -68,6 +68,11 @@ def test_admin_token(test_admin_user):
 def test_admin_client(test_client: TestClient, test_admin_token):
     test_client.headers["authorization"] = f"Bearer {test_admin_token}"
     return test_client
+
+
+@pytest.fixture
+def user_manager(db_session):
+    return UserManager(db_session)
 
 
 @pytest.fixture
