@@ -17,4 +17,8 @@ export class UserService {
   deleteCurrentUser(): Observable<void> {
     return this.http.delete<void>(environment.apiUrl + '/users/me');
   }
+
+  registerUser(user: User): Observable<User> {
+    return this.http.post<User>(environment.apiUrl + '/users', user);
+  }
 }
