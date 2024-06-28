@@ -3,12 +3,14 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTabsModule } from '@angular/material/tabs';
 import { Subject, takeUntil } from 'rxjs';
-import { LoginService } from './services/login.service';
-import { LoginData } from './models/logindata.model';
+import { LoginformComponent } from './components/loginform/loginform.component';
+import { RegisterformComponent } from './components/registerform/registerform.component';
 import { FacebookLoginComponent } from './components/facebook-login/facebook-login.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { LoginService } from './services/login.service';
 import { UserService } from './services/user.service';
 
 @Component({
@@ -20,6 +22,9 @@ import { UserService } from './services/user.service';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatTabsModule,
+    LoginformComponent,
+    RegisterformComponent,
     FacebookLoginComponent,
     TasksComponent,
     ChatComponent,
@@ -55,14 +60,6 @@ export class AppComponent implements OnInit, OnDestroy{
   ngOnDestroy(): void {
       this.unsubscribe$.next();
       this.unsubscribe$.complete();
-  }
-
-  login(loginData: LoginData) {
-    this.loginService.login(loginData).subscribe((jwt) => {
-      localStorage.setItem('jwt', jwt.access_token);
-      localStorage.setItem('refresh', jwt.refresh_token);
-      this.loginService.updateStatus(true);
-    });
   }
 
   loadUserInfo() {
