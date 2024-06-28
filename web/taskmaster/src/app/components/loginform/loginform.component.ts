@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -8,7 +8,10 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { finalize } from 'rxjs';
 import { LoginData } from '../../models/logindata.model';
+import { SnackBarService } from '../../services/snackBar.service';
+import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-loginform',
@@ -23,20 +26,37 @@ import { LoginData } from '../../models/logindata.model';
   styleUrl: './loginform.component.scss',
 })
 export class LoginformComponent {
-  @Input() disabled = false;
-
-  @Output() loginEvent = new EventEmitter<LoginData>();
+  disabled = false;
 
   loginForm = new FormGroup({
     username: new FormControl<string>('', Validators.required),
     password: new FormControl<string>('', Validators.required),
   });
 
+  constructor(
+    private loginService: LoginService,
+    private snackBarService: SnackBarService,
+  ) {}
+
   login() {
-    const loginData = {
-      username: this.loginForm.value.username!,
-      password: this.loginForm.value.password!,
-    };
-    this.loginEvent.emit(loginData);
+    const loginData = new LoginData(
+      this.loginForm.value.username!,
+      this.loginForm.value.password!
+    );
+    this.disabled = true;
+    this.loginService.login(loginData).pipe(
+    finalize(() => {
+      this.disabled = false;
+    })).subscribe({
+      next: (jwt) => {
+        localStorage.setItem('jwt', jwt.access_token);
+        localStorage.setItem('refresh', jwt.refresh_token);
+        this.loginService.updateStatus(true);
+        this.snackBarService.openSnackbar('Login Successful', 'success');
+      },
+      error: () => {
+        this.snackBarService.openSnackbar('Login Failed', 'error');
+      },
+    });
   }
 }
