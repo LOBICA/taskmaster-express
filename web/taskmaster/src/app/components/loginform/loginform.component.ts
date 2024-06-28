@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { LoginData } from '../../models/logindata.model';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-loginform',
@@ -22,10 +23,16 @@ import { LoginData } from '../../models/logindata.model';
   templateUrl: './loginform.component.html',
   styleUrl: './loginform.component.scss',
 })
-export class LoginformComponent {
+export class LoginformComponent implements OnInit {
   @Input() disabled = false;
 
   @Output() loginEvent = new EventEmitter<LoginData>();
+
+  constructor(private analytics: AnalyticsService) {}
+
+  ngOnInit(): void {
+    this.analytics.trackEvent('Login Form', 'User reached the login form', 'AUTH');
+  }
 
   loginForm = new FormGroup({
     username: new FormControl<string>('', Validators.required),
