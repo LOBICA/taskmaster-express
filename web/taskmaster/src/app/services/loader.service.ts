@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class LoaderService {
   private loadingStatus = new BehaviorSubject<boolean>(false);
-  constructor() {}
 
   get status$() {
     return this.loadingStatus.asObservable();

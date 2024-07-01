@@ -18,6 +18,7 @@ export class ChatService {
     const ws = new WebSocket(environment.apiUrl + '/chat/' + token);
 
     this.socket.subscribe({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       next: (data: any) => {
         if(data && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(data));
@@ -29,9 +30,11 @@ export class ChatService {
 
     ws.onmessage = (event) => this.socket.next(event);
     ws.onerror = (event) => this.socket.error(event);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ws.onclose = (event) => this.socket.complete();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public send(data: any): void {
     if (data) {
       this.socket.next(data);

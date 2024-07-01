@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -26,7 +26,7 @@ import { LoginService } from '../../services/login.service';
   templateUrl: './loginform.component.html',
   styleUrl: './loginform.component.scss',
 })
-export class LoginformComponent {
+export class LoginformComponent implements OnInit {
   disabled = false;
 
   loginForm = new FormGroup({
