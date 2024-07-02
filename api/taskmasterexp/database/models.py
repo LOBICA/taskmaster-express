@@ -24,9 +24,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserModel(BaseModel):
     __tablename__ = "users"
 
+    name: Mapped[str]
     email: Mapped[str | None] = mapped_column(unique=True)
     password: Mapped[str | None]
-    name: Mapped[str]
+
+    phone_number: Mapped[str | None] = mapped_column(unique=True)
 
     fb_user_id: Mapped[str | None]
     fb_access_token: Mapped[str | None]

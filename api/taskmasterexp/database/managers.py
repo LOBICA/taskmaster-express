@@ -37,6 +37,15 @@ class UserManager(BaseManager):
 
         return None
 
+    async def get_by_phone(self, phone_number: str) -> User | None:
+        stmt = select(UserModel).where(UserModel.phone_number == phone_number)
+        result: Result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+        if model:
+            return User.from_orm(model)
+
+        return None
+
     async def save(self, user: User, password: str = None) -> User:
         if user.uuid:
             model = await self.session.get(UserModel, user.uuid)
