@@ -38,6 +38,9 @@ async def _get_current_user(session: DBSession, encoded_token: str) -> User:
     except (MultipleResultsFound, NoResultFound):
         raise credentials_exception
 
+    if user.disabled:
+        raise credentials_exception
+
     return User.from_orm(user)
 
 

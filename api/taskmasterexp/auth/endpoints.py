@@ -44,6 +44,9 @@ async def get_authentication_token(
     if not user.verify_password(form_data.password):
         raise credentials_exception
 
+    if user.disabled:
+        raise credentials_exception
+
     token_data = Token.create_with_username(user.uuid)
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
@@ -81,6 +84,9 @@ async def refresh_authentication_token(
     user = results.scalar_one_or_none()
 
     if not user:
+        raise credentials_exception
+
+    if user.disabled:
         raise credentials_exception
 
     token_data = Token.create_with_username(user.uuid)
@@ -156,6 +162,12 @@ async def facebok_login(session: DBSession, token: AccessTokenInput):
             session.add(user)
 
         user.fb_user_id = fb_info.fb_user_id
+
+    if user.disabled:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is disabled",
+        )
 
     user.fb_access_token = fb_info.token
     await session.commit()

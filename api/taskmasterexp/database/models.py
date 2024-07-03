@@ -37,6 +37,8 @@ class UserModel(BaseModel):
         back_populates="user", cascade="all, delete"
     )
 
+    disabled: Mapped[bool] = mapped_column(default=False)
+
     def set_password(self, password: str):
         self.password = pwd_context.hash(password)
 
