@@ -10,7 +10,7 @@ from taskmasterexp.settings import (
     WHATSAPP_NUMBER,
 )
 
-from .assistant import WhatsAppAgent
+from .dependencies import WhatsAppAgent
 
 logger = logging.getLogger(__name__)
 

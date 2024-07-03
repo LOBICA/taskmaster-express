@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, WebSocket
 from pydantic import BaseModel, Field, ValidationError
 
-from .assistant import ChatAgent
+from .dependencies import ChatAgent
 
 logger = logging.getLogger(__name__)
 

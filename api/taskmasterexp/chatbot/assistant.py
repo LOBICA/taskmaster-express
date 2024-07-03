@@ -1,7 +1,5 @@
 import logging
-from typing import Annotated
 
-from fastapi import Depends
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 
@@ -58,13 +56,7 @@ async def get_chat_agent(
     return await _get_chat_agent(user)
 
 
-ChatAgent = Annotated[AgentExecutor, Depends(get_chat_agent)]
-
-
 async def get_whatsapp_chat_agent(
     user: CurrentUserWA,
 ) -> AgentExecutor:
     return await _get_chat_agent(user)
-
-
-WhatsAppAgent = Annotated[AgentExecutor, Depends(get_whatsapp_chat_agent)]
