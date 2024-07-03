@@ -10,7 +10,7 @@ from taskmasterexp.settings import (
     WHATSAPP_NUMBER,
 )
 
-from .dependencies import WhatsAppAgent
+from .dependencies import ChatHistoryWA, WhatsAppAgent
 
 logger = logging.getLogger(__name__)
 
@@ -28,14 +28,18 @@ def _send_message(text: str, destination: str):
 @router.post("/webhook", status_code=status.HTTP_204_NO_CONTENT)
 async def receive_message(
     agent: WhatsAppAgent,
+    history: ChatHistoryWA,
     From: Annotated[str, Form()],
     Body: Annotated[str, Form()],
 ):
     logger.info(f"Received message: {Body}")
+    messages = await history.get_messages()
     response = await agent.ainvoke(
         {
-            "history": [],
+            "history": messages,
             "text": Body,
         }
     )
     _send_message(response["output"], destination=From)
+    await history.add_message("human", Body)
+    await history.add_message("ai", response["output"])
