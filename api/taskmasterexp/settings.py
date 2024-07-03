@@ -13,6 +13,7 @@ REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv(
 PSQL_CONNECTION_STRING = os.getenv("DATABASE_URL", "").replace(
     "postgres", "postgresql+asyncpg"
 )
+REDIS_URL = os.getenv("REDIS_URL")
 CORS_ORIGINS = [url.strip() for url in os.getenv("CORS_ORIGINS", "").split(",")]
 FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
 FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
