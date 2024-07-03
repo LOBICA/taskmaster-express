@@ -96,6 +96,20 @@ yarl = ">=1.0,<2.0"
 speedups = ["Brotli", "aiodns", "brotlicffi"]
 
 [[package]]
+name = "aiohttp-retry"
+version = "2.8.3"
+description = "Simple retry client for aiohttp"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "aiohttp_retry-2.8.3-py3-none-any.whl", hash = "sha256:3aeeead8f6afe48272db93ced9440cf4eda8b6fd7ee2abb25357b7eb28525b45"},
+    {file = "aiohttp_retry-2.8.3.tar.gz", hash = "sha256:9a8e637e31682ad36e1ff9f8bcba912fcfc7d7041722bc901a4b948da4d71ea9"},
+]
+
+[package.dependencies]
+aiohttp = "*"
+
+[[package]]
 name = "aiosignal"
 version = "1.3.1"
 description = "aiosignal: a list of registered asynchronous callbacks"
@@ -2089,6 +2103,23 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
+name = "twilio"
+version = "9.2.2"
+description = "Twilio API client and TwiML generator"
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "twilio-9.2.2-py2.py3-none-any.whl", hash = "sha256:3c758cc9383ab3b8d740628e6811301dca450c6e10e128e13687b8605c34024f"},
+    {file = "twilio-9.2.2.tar.gz", hash = "sha256:0849fa11b1a8d3a2c3a783c2fe230d7dd9457a086eddc9d9979fba8bb4702b80"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.8.4"
+aiohttp-retry = ">=2.8.3"
+PyJWT = ">=2.0.0,<3.0.0"
+requests = ">=2.0.0"
+
+[[package]]
 name = "typing-extensions"
 version = "4.11.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2459,4 +2490,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "2496a422c460ad8471c5953a8ebc9005b1ce45c4fbf7cf25551808791dc5e4c4"
+content-hash = "2b43cd70ee6a0da705f1bc43f450d9beb828717a167506702d572a6c76a491d7"
