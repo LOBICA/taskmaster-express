@@ -21,14 +21,14 @@ class ChatHistory:
         return f"history:{self.session_id}"
 
     async def _get_history(self) -> list[dict[str, str]]:
-        raw_history = self.redis.get(self._key())
+        raw_history = await self.redis.get(self._key())
         if raw_history is None:
             return []
 
         return json.loads(raw_history)
 
     async def _save_history(self, history: list[dict[str, str]]):
-        self.redis.set(self._key(), json.dumps(history), ex=self.expiration_time)
+        await self.redis.set(self._key(), json.dumps(history), ex=self.expiration_time)
 
     async def add_message(self, message_class: str, message: str):
         message_ = Message(message_class=message_class, message=message)
