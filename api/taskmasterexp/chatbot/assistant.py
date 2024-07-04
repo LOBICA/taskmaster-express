@@ -22,9 +22,16 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
     task_template = "[title]\n[description]\nStatus: [status]\n"
 
     if not user.email:
-        email_message = "The user does not have an email address associated, ask for an email address when you greet them. Be polite and only ask once."
+        email_message = (
+            "The user does not have an email address associated,"
+            " ask for an email address when you greet them."
+            " Be polite and only ask once."
+        )
     else:
-        email_message = "The user already has an email address, we won't be able to associate a new one"
+        email_message = (
+            "The user already has an email address, "
+            "we won't be able to associate a new one"
+        )
 
     messages = [
         ("system", "You are a helpful assistant"),
