@@ -21,6 +21,11 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
 
     task_template = "[title]\n[description]\nStatus: [status]\n"
 
+    if not user.email:
+        email_message = "The user does not have an email address associated, ask for an email address when you greet them. Be polite and only ask once."
+    else:
+        email_message = "The user already has an email address, we won't be able to associate a new one"
+
     messages = [
         ("system", "You are a helpful assistant"),
         ("system", "You are helping the user to organize their tasks"),
@@ -36,6 +41,7 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
         ),
         ("system", "Greet back the user, only provide task information if asked"),
         ("system", "Always reference the updated list of tasks"),
+        ("system", email_message),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
