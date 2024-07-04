@@ -37,6 +37,15 @@ class UserManager(BaseManager):
 
         return None
 
+    async def get_by_phone(self, phone_number: str) -> User | None:
+        stmt = select(UserModel).where(UserModel.phone_number == phone_number)
+        result: Result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+        if model:
+            return User.from_orm(model)
+
+        return None
+
     async def save(self, user: User, password: str = None) -> User:
         if user.uuid:
             model = await self.session.get(UserModel, user.uuid)
@@ -63,6 +72,54 @@ class UserManager(BaseManager):
                 await self.session.commit()
             else:
                 raise ValueError("Invalid password")
+
+    async def _merge_users(
+        self, primary_user: UserModel, secondary_user: UserModel
+    ) -> None:
+        if not primary_user.email:
+            primary_user.email = secondary_user.email
+            secondary_user.email = None
+
+        if not primary_user.password:
+            primary_user.password = secondary_user.password
+
+        if not primary_user.phone_number:
+            primary_user.phone_number = secondary_user.phone_number
+            secondary_user.phone_number = None
+
+        if not primary_user.fb_user_id:
+            primary_user.fb_user_id = secondary_user.fb_user_id
+            secondary_user.fb_user_id = None
+
+        tasks: list[TaskModel] = await secondary_user.awaitable_attrs.tasks
+        for task in tasks:
+            task.user_id = primary_user.uuid
+
+        secondary_user.disabled = True
+
+        await self.session.commit()
+
+    async def merge_users(self, primary_user_id: UUID, secondary_user_id: UUID) -> None:
+        primary_user = await self.session.get(UserModel, primary_user_id)
+        secondary_user = await self.session.get(UserModel, secondary_user_id)
+        if primary_user and secondary_user:
+            await self._merge_users(primary_user, secondary_user)
+
+    async def associate_email(self, user_id: UUID, email: str) -> None:
+        user = await self.session.get(UserModel, user_id)
+
+        if user is None or user.email:
+            raise Exception("User not found or already has an email")
+
+        stmt = select(UserModel).where(UserModel.email == email)
+        result = await self.session.execute(stmt)
+        existing_user = result.scalar_one_or_none()
+
+        if existing_user and user:
+            await self._merge_users(user, existing_user)
+        elif user:
+            user.email = email
+            await self.session.commit()
 
     async def delete(self, user_id: UUID) -> None:
         model = await self.session.get(UserModel, user_id)

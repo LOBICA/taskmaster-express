@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import managers
 from .connection import get_engine, get_session
+from .redis import get_redis, redis
 
 
 async def inject_db_session():
@@ -28,3 +29,5 @@ async def inject_user_manager(session: DBSession):
 
 
 UserManager = Annotated[managers.UserManager, Depends(inject_user_manager)]
+
+Redis = Annotated[redis.Redis, Depends(get_redis)]

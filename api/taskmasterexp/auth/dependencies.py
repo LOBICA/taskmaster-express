@@ -1,14 +1,14 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, status
+from fastapi import Depends, Form, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
-from taskmasterexp.database.dependencies import DBSession
+from taskmasterexp.database.dependencies import DBSession, UserManager
 from taskmasterexp.database.models import UserModel
 from taskmasterexp.schemas.users import User
 
@@ -38,6 +38,9 @@ async def _get_current_user(session: DBSession, encoded_token: str) -> User:
     except (MultipleResultsFound, NoResultFound):
         raise credentials_exception
 
+    if user.disabled:
+        raise credentials_exception
+
     return User.from_orm(user)
 
 
@@ -51,6 +54,25 @@ async def get_current_user_ws(session: DBSession, token: str) -> User:
     return await _get_current_user(session, token)
 
 
+async def get_current_user_whatsapp(
+    manager: UserManager,
+    ProfileName: Annotated[str, Form()],
+    WaId: Annotated[str, Form()],
+) -> User:
+    user = await manager.get_by_phone(WaId)
+
+    if not user:
+        user = User(
+            name=ProfileName,
+            phone_number=WaId,
+        )
+        user = await manager.save(user)
+
+    return user
+
+
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 CurrentUserWS = Annotated[User, Depends(get_current_user_ws)]
+
+CurrentUserWA = Annotated[User, Depends(get_current_user_whatsapp)]

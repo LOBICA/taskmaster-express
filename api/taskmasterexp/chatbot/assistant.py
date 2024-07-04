@@ -1,28 +1,37 @@
 import logging
-from typing import Annotated
 
-from fastapi import Depends
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 
-from taskmasterexp.auth.dependencies import CurrentUserWS
+from taskmasterexp.auth.dependencies import CurrentUserWA, CurrentUserWS
 from taskmasterexp.schemas.tasks import Task
+from taskmasterexp.schemas.users import User
 
 from .client import chat_model
 from .tools import tools
 
 logger = logging.getLogger(__name__)
 
-template = "You are a helpful assistant"
+
 human_template = "{text}"
 
 
-async def get_chat_agent(
-    user: CurrentUserWS,
-) -> AgentExecutor:
+async def _get_chat_agent(user: User) -> AgentExecutor:
     logger.info(f"Getting chat prompt for user {user.uuid}")
 
     task_template = "[title]\n[description]\nStatus: [status]\n"
+
+    if not user.email:
+        email_message = (
+            "The user does not have an email address associated,"
+            " ask for an email address when you greet them."
+            " Be polite and only ask once."
+        )
+    else:
+        email_message = (
+            "The user already has an email address, "
+            "we won't be able to associate a new one"
+        )
 
     messages = [
         ("system", "You are a helpful assistant"),
@@ -39,6 +48,7 @@ async def get_chat_agent(
         ),
         ("system", "Greet back the user, only provide task information if asked"),
         ("system", "Always reference the updated list of tasks"),
+        ("system", email_message),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -53,4 +63,13 @@ async def get_chat_agent(
     return agent_executor
 
 
-ChatAgent = Annotated[AgentExecutor, Depends(get_chat_agent)]
+async def get_chat_agent(
+    user: CurrentUserWS,
+) -> AgentExecutor:
+    return await _get_chat_agent(user)
+
+
+async def get_whatsapp_chat_agent(
+    user: CurrentUserWA,
+) -> AgentExecutor:
+    return await _get_chat_agent(user)

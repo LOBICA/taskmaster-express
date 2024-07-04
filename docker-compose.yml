@@ -9,12 +9,14 @@ services:
     env_file: .env
     environment:
       - DATABASE_URL=postgres://taskmaster:password@db/taskmaster
+      - REDIS_URL=redis://redis:6379
       - CORS_ORIGINS=http://localhost:4200,https://taskmaster.local
     command: "sh scripts/launch-api.local.sh"
     volumes:
       - ./api:/usr/src/app
     depends_on:
       - db
+      - redis
   web:
     build:
       context: ./web/taskmaster
@@ -48,6 +50,10 @@ services:
       - POSTGRES_USER=taskmaster
     ports:
       - "5432:5432"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
   https-portal:
     image: steveltn/https-portal
     ports:
