@@ -4,7 +4,7 @@ from uuid import UUID
 
 from langchain_core.tools import tool
 
-from taskmasterexp.database.managers import TaskManager
+from taskmasterexp.database.managers import TaskManager, UserManager
 from taskmasterexp.schemas.tasks import Task, TaskStatus
 
 logger = logging.getLogger(__name__)
@@ -98,6 +98,25 @@ async def delete_task(task_id: str):
         await manager.delete(UUID(task_id))
 
 
+@tool
+async def associate_email_to_user(user_id: str, email: str):
+    """Associate an email to a user.
+
+    Provided the user's uuid and the email, associate the email to the user.
+
+    If the email was associated correctly, return True, otherwise False.
+    """
+    logger.info(f"Associating email {email} to user {user_id}")
+    async with UserManager.start_session() as manager:
+        try:
+            await manager.associate_email(UUID(user_id), email)
+        except Exception as e:
+            logger.exception(e)
+            return False
+
+        return True
+
+
 tools = [
     get_current_time,
     get_task_list,
@@ -105,4 +124,5 @@ tools = [
     modify_task,
     complete_task,
     delete_task,
+    associate_email_to_user,
 ]
