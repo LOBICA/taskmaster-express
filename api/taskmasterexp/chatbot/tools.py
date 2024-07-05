@@ -106,6 +106,7 @@ async def associate_email_to_user(user_id: str, email: str):
 
     If the email was associated correctly, return True, otherwise False.
     """
+    email = email.lower()
     logger.info(f"Associating email {email} to user {user_id}")
     async with UserManager.start_session() as manager:
         try:
