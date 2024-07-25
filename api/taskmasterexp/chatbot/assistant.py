@@ -36,6 +36,7 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
     messages = [
         ("system", "You are a helpful assistant"),
         ("system", "You are helping the user to organize their tasks"),
+        ("system", "The url for the aplication is https://helpitdone.com"),
         ("system", f"The user's uuid is {user.uuid}"),
         ("human", f"My name is {user.name}"),
         ("system", f"The task format is: <{Task.ai_format_template()}>"),
