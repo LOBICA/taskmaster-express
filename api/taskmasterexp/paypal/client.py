@@ -6,7 +6,7 @@ import httpx
 
 from taskmasterexp.settings import PAYPAL_API_URL, PAYPAL_CLIENT_ID, PAYPAL_SECRET_KEY
 
-from .schemas import Product
+from .schemas import Product, SubscriptionPlan, SubscriptionPlanData
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +82,81 @@ class PayPalClient:
         }
 
         response = httpx.post(url, headers=headers, json=product)
+        response.raise_for_status()
+        data = response.json()
+        return data["id"]
+
+    def list_subscription_plans(self, product_id: str) -> list[SubscriptionPlan]:
+        headers = self._get_headers()
+        url = f"{PAYPAL_API_URL}/v1/billing/plans?product_id={product_id}"
+        response = httpx.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return [
+            SubscriptionPlan(
+                product_id=product_id,
+                id_=plan["id"],
+                name=plan["name"],
+                description=plan["description"],
+                status=plan["status"],
+            )
+            for plan in data["plans"]
+        ]
+
+    def create_subscription_plan(
+        self,
+        product_id: str,
+        name: str,
+        description: str,
+        monthly_price: str,
+        trial_months: int = 0,
+    ) -> str:
+        billing_cycles = []
+        if trial_months:
+            billing_cycles.append(
+                {
+                    "frequency": {
+                        "interval_unit": "MONTH",
+                        "interval_count": 1,
+                    },
+                    "tenure_type": "TRIAL",
+                    "sequence": 1,
+                    "total_cycles": trial_months,
+                }
+            )
+
+        billing_cycles.append(
+            {
+                "frequency": {
+                    "interval_unit": "MONTH",
+                    "interval_count": 1,
+                },
+                "tenure_type": "REGULAR",
+                "sequence": 2 if trial_months else 1,
+                "total_cycles": 0,
+                "pricing_scheme": {
+                    "fixed_price": {
+                        "currency_code": "USD",
+                        "value": monthly_price,
+                    }
+                },
+            }
+        )
+
+        subscription_plan = SubscriptionPlanData(
+            product_id=product_id,
+            name=name,
+            description=description,
+            billing_cycles=billing_cycles,
+            payment_preferences={
+                "auto_bill_outstanding": True,
+                "payment_failure_threshold": 3,
+            },
+        )
+
+        headers = self._get_headers()
+        url = f"{PAYPAL_API_URL}/v1/billing/plans"
+        response = httpx.post(url, headers=headers, json=subscription_plan.dict())
         response.raise_for_status()
         data = response.json()
         return data["id"]
