@@ -13,6 +13,7 @@
         }
       </mat-menu>
       @if (loggedIn) {
+        <app-subscription-banner />
         <app-chat [user]="user" />
       } @else {
         <mat-tab-group>
