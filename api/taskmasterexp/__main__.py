@@ -4,12 +4,17 @@ from uuid import UUID
 import click
 
 from taskmasterexp.database.managers import UserManager
+from taskmasterexp.paypal.cli import add_paypal_product, list_paypal_products
 from taskmasterexp.schemas.users import User
 
 
 @click.group()
 def cli():
     pass
+
+
+cli.add_command(add_paypal_product)
+cli.add_command(list_paypal_products)
 
 
 async def _create_user(name, email, password):
