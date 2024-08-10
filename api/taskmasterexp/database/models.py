@@ -33,6 +33,10 @@ class UserModel(BaseModel):
     fb_user_id: Mapped[str | None]
     fb_access_token: Mapped[str | None]
 
+    subscription: Mapped["SubscriptionModel"] = relationship(
+        back_populates="user", cascade="all, delete"
+    )
+
     tasks: Mapped[list["TaskModel"]] = relationship(
         back_populates="user", cascade="all, delete"
     )
@@ -47,6 +51,19 @@ class UserModel(BaseModel):
             return False
 
         return pwd_context.verify(password, self.password)
+
+    def has_active_subscription(self):
+        results = self.subscription.filter(SubscriptionModel.active == True).all()
+        return len(results) > 0
+
+
+class SubscriptionModel(BaseModel):
+    __tablename__ = "subscription"
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.uuid"))
+    user: Mapped["UserModel"] = relationship(back_populates="subscription")
+
+    active: Mapped[bool] = mapped_column(default=True)
 
 
 class TaskModel(BaseModel):
