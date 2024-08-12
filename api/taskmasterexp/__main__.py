@@ -18,6 +18,7 @@ from taskmasterexp.schemas.users import User
 def cli():
     pass
 
+
 cli.add_command(seed)
 
 cli.add_command(list_paypal_products)
