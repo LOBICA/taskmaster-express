@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { loadScript } from '@paypal/paypal-js';
-import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -11,16 +10,24 @@ import { environment } from '../../../environments/environment';
   styleUrl: './paypal-button.component.scss'
 })
 export class PaypalButtonComponent implements OnInit {
+  @Input() clientId: string = '';
+  @Input() planId: string = '';
 
   constructor() { }
 
   ngOnInit(): void {
-    loadScript({ "clientId": environment.paypalClientId, "vault": true, "intent": "subscription" }).then((paypal) => {
+    const planId = this.planId;
+
+    loadScript({
+      "clientId": this.clientId,
+      "vault": true,
+      "intent": "subscription",
+    }).then((paypal) => {
       if(paypal?.Buttons) {
         paypal.Buttons({
           createSubscription: function(data, actions) {
             return actions.subscription.create({
-             'plan_id': environment.paypalPlanId,
+             'plan_id': planId,
              });
            },
          }).render('#paypal-button-container');
