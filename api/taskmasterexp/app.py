@@ -9,6 +9,7 @@ from . import __version__
 from .auth.endpoints import router as auth_endpoints
 from .chatbot import messages, ws
 from .endpoints import tasks, users
+from .paypal import webhooks
 from .settings import CORS_ORIGINS
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -39,3 +40,4 @@ app.include_router(users.router)
 app.include_router(tasks.router)
 app.include_router(ws.router)
 app.include_router(messages.router)
+app.include_router(webhooks.router)

@@ -1,10 +1,16 @@
+import json
 import logging
 from datetime import datetime, timedelta
 from typing import Self
 
 import httpx
 
-from taskmasterexp.settings import PAYPAL_API_URL, PAYPAL_CLIENT_ID, PAYPAL_SECRET_KEY
+from taskmasterexp.settings import (
+    PAYPAL_API_URL,
+    PAYPAL_CLIENT_ID,
+    PAYPAL_SECRET_KEY,
+    PAYPAL_WEBHOOK_ID,
+)
 
 from .schemas import Product, SubscriptionPlan, SubscriptionPlanData
 
@@ -160,3 +166,36 @@ class PayPalClient:
         response.raise_for_status()
         data = response.json()
         return data["id"]
+
+    def verify_paypal_webhook(
+        self,
+        transmission_id: str,
+        timestamp: str,
+        cert_url: str,
+        auth_algo: str,
+        transmission_sig: str,
+        body: bytes,
+    ):
+        data = {
+            "transmission_id": transmission_id,
+            "transmission_time": timestamp,
+            "cert_url": cert_url,
+            "auth_algo": auth_algo,
+            "transmission_sig": transmission_sig,
+            "webhook_id": PAYPAL_WEBHOOK_ID,
+            "webhook_event": "[BODY]",
+        }
+        json_data = json.dumps(data)
+        json_data = json_data.replace('"[BODY]"', body.decode())
+        headers = self._get_headers()
+        url = f"{PAYPAL_API_URL}/v1/notifications/verify-webhook-signature"
+        logger.info(json_data)
+        response = httpx.post(url, headers=headers, content=json_data)
+        try:
+            response.raise_for_status()
+        except Exception:
+            logger.error(response.text)
+            raise
+        data = response.json()
+        logger.info(data)
+        return data["verification_status"] == "SUCCESS"
