@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { loadScript } from '@paypal/paypal-js';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
+import { SubscriptionService } from '../../services/subscription.service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class PaypalButtonComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private subscriptionService: SubscriptionService,
   ) {
     this.userService.getCurrentUser().subscribe(user => {
       this.user = user;
@@ -29,6 +31,8 @@ export class PaypalButtonComponent implements OnInit {
   ngOnInit(): void {
     const planId = this.planId;
     const userId = this.user?.uuid || undefined;
+
+    const subscriptionService = this.subscriptionService;
 
     loadScript({
       "clientId": this.clientId,
@@ -46,6 +50,12 @@ export class PaypalButtonComponent implements OnInit {
              'custom_id': userId,
              });
            },
+          onApprove: function(data, actions) {
+            subscriptionService.activateSubscription(data.orderID).subscribe(() => {
+              subscriptionService.checkSubscriptionStatus();
+            });
+            return Promise.resolve();
+          },
          }).render('#paypal-button-container');
       }
     }).catch((err) => {
