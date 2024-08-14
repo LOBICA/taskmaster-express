@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, input } from '@angular/core';
 import { loadScript } from '@paypal/paypal-js';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
@@ -14,6 +14,7 @@ import { User } from '../../models/user.model';
 export class PaypalButtonComponent implements OnInit {
   @Input() clientId: string = '';
   @Input() planId: string = '';
+  @Input() layout: 'vertical' | 'horizontal' = 'vertical';
 
   user: User | undefined | null;
 
@@ -36,6 +37,9 @@ export class PaypalButtonComponent implements OnInit {
     }).then((paypal) => {
       if(paypal?.Buttons) {
         paypal.Buttons({
+          style: {
+            layout: this.layout,
+          },
           createSubscription: function(data, actions) {
             return actions.subscription.create({
              'plan_id': planId,
