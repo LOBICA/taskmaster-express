@@ -8,7 +8,11 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from taskmasterexp.app import app
 from taskmasterexp.auth.token import Token, create_access_token
 from taskmasterexp.database.dependencies import inject_db_session
-from taskmasterexp.database.managers import TaskManager, UserManager
+from taskmasterexp.database.managers import (
+    SubscriptionManager,
+    TaskManager,
+    UserManager,
+)
 from taskmasterexp.database.models import BaseModel, UserModel
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
@@ -78,6 +82,11 @@ def user_manager(db_session):
 @pytest.fixture
 def task_manager(db_session):
     return TaskManager(db_session)
+
+
+@pytest.fixture
+def subscription_manager(db_session):
+    return SubscriptionManager(db_session)
 
 
 @pytest.fixture

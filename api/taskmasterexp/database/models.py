@@ -58,12 +58,15 @@ class UserModel(BaseModel):
 
 
 class SubscriptionModel(BaseModel):
-    __tablename__ = "subscription"
+    __tablename__ = "subscriptions"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.uuid"))
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.uuid"))
     user: Mapped["UserModel"] = relationship(back_populates="subscription")
 
-    active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(default=True)
+
+    order_id: Mapped[str | None]
+    plan_id: Mapped[str | None]
 
 
 class TaskModel(BaseModel):
