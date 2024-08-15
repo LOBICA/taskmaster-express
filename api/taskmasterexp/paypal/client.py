@@ -199,3 +199,14 @@ class PayPalClient:
         data = response.json()
         logger.info(data)
         return data["verification_status"] == "SUCCESS"
+
+    async def cancel_subscription(self, subscription_id: str):
+        headers = self._get_headers()
+        body = {
+            "reason": "Requested by user in the app",  # TODO should capture the reason from the user
+        }
+        url = f"{PAYPAL_API_URL}/v1/billing/subscriptions/{subscription_id}/cancel"
+
+        async with httpx.AsyncClient() as async_client:
+            response = await async_client.post(url, headers=headers, json=body)
+            response.raise_for_status()
