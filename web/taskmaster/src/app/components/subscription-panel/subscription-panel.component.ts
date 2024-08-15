@@ -20,15 +20,15 @@ export class SubscriptionPanelComponent implements OnInit, OnDestroy {
   paypalClientId = environment.paypalClientId;
   paypalPlanId = environment.paypalPlanId;
 
-  subscriptionStatus: boolean = false;
+  subscriptionIsActive: boolean = false;
   unsubscribe$ = new Subject<void>();
 
   constructor(private subscriptionService: SubscriptionService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.subscriptionService.activeSubscription$.pipe(takeUntil(this.unsubscribe$)).subscribe((status) => {
-      console.log('Subscription status:', status);
-      this.subscriptionStatus = status;
+    this.subscriptionService.activeSubscription$.pipe(takeUntil(this.unsubscribe$)).subscribe((isActive) => {
+      console.log('Subscription status:', isActive);
+      this.subscriptionIsActive = isActive;
     });
     this.subscriptionService.checkSubscriptionStatus();
   }

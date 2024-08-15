@@ -14,7 +14,7 @@ export class SubscriptionService {
 
   checkSubscriptionStatus() {
     this.getSubscriptionStatus().subscribe((subscription) => {
-      this.activeSubscription$.next(subscription.status);
+      this.activeSubscription$.next(subscription.isActive);
     });
   }
 

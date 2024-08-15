@@ -1,8 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SubscriptionData(BaseModel):
-    status: bool
+    is_active: bool = Field(..., alias="isActive")
+    class Config:
+        allow_population_by_field_name = True
 
 
 class SubscriptionResponse(SubscriptionData):

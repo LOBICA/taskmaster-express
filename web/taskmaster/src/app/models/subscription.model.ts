@@ -1,5 +1,5 @@
 export class Subscription{
     constructor(
-        public status: boolean,
+        public isActive: boolean,
     ) {}
 }
