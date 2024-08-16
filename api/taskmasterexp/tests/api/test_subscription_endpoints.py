@@ -8,17 +8,17 @@ async def test_subscription_status(
 ):
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == False
+    assert response.json()["isActive"] is False
 
     await subscription_manager.link_subscription(test_admin_user.uuid, ORDER_ID)
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == False
+    assert response.json()["isActive"] is False
 
     await subscription_manager.activate_subscription("I-HBMDL8PL8571", "plan_id")
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == True
+    assert response.json()["isActive"] is True
 
 
 async def test_link_subscription(
@@ -26,13 +26,13 @@ async def test_link_subscription(
 ):
     response = test_admin_client.post("/subscriptions/link", json={"orderId": ORDER_ID})
     assert response.status_code == 200
-    assert response.json()["isActive"] == False
+    assert response.json()["isActive"] is False
 
     await subscription_manager.activate_subscription(ORDER_ID, "plan_id")
 
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == True
+    assert response.json()["isActive"] is True
 
 
 async def test_cancel_subscription(
@@ -43,11 +43,11 @@ async def test_cancel_subscription(
 
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == True
+    assert response.json()["isActive"] is True
 
     response = test_admin_client.post("/subscriptions/cancel")
     assert response.status_code == 204
 
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
-    assert response.json()["isActive"] == False
+    assert response.json()["isActive"] is False

@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.sql.expression import true
 
 from taskmasterexp.schemas.tasks import TaskMood, TaskStatus
 
@@ -53,7 +54,7 @@ class UserModel(BaseModel):
         return pwd_context.verify(password, self.password)
 
     def has_active_subscription(self):
-        results = self.subscription.filter(SubscriptionModel.active == True).all()
+        results = self.subscription.filter(SubscriptionModel.active == true()).all()
         return len(results) > 0
 
 

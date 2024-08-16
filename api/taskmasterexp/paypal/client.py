@@ -202,7 +202,8 @@ class PayPalClient:
     async def cancel_subscription(self, subscription_id: str):
         headers = self._get_headers()
         body = {
-            "reason": "Requested by user in the app",  # TODO should capture the reason from the user
+            # TODO should capture the reason from the user
+            "reason": "Requested by user in the app",
         }
         url = f"{PAYPAL_API_URL}/v1/billing/subscriptions/{subscription_id}/cancel"
 
