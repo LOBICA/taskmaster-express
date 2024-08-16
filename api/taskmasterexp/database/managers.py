@@ -200,9 +200,9 @@ class SubscriptionManager(BaseManager):
         await self.session.refresh(subscription)
         return Subscription.from_orm(subscription)
 
-    async def cancel_subscription(self, user_id: UUID) -> None:
+    async def cancel_subscription(self, order_id: str) -> None:
         stmt = select(SubscriptionModel).where(
-            SubscriptionModel.user_id == user_id,
+            SubscriptionModel.order_id == order_id,
             SubscriptionModel.is_active == True,
         )
         results = await self.session.execute(stmt)

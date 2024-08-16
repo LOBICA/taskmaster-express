@@ -73,7 +73,7 @@ async def test_cancel_subscription(
     )
     assert subscription.order_id == ORDER_ID
 
-    await subscription_manager.cancel_subscription(test_admin_user.uuid)
+    await subscription_manager.cancel_subscription(ORDER_ID)
     subscription = await subscription_manager.get_active_subscription(
         test_admin_user.uuid
     )

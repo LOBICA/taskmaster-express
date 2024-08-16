@@ -189,7 +189,6 @@ class PayPalClient:
         json_data = json_data.replace('"[BODY]"', body.decode())
         headers = self._get_headers()
         url = f"{PAYPAL_API_URL}/v1/notifications/verify-webhook-signature"
-        logger.info(json_data)
         response = httpx.post(url, headers=headers, content=json_data)
         try:
             response.raise_for_status()

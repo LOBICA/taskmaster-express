@@ -46,4 +46,4 @@ async def cancel_subscription(
         current_user.uuid
     )
     await paypal_client.cancel_subscription(subscription.order_id)
-    await subscriptions_manager.cancel_subscription(current_user.uuid)
+    await subscriptions_manager.cancel_subscription(subscription.order_id)

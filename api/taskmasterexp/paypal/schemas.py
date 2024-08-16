@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -44,4 +46,25 @@ class SubscriptionPlanData(BaseModel):
 
 class SubscriptionPlan(SubscriptionPlanData):
     id_: str
+    status: str
+
+
+class EventType(str, Enum):
+    SUBSCRIPTION_CREATED = "BILLING.SUBSCRIPTION.CREATED"
+    SUBSCRIPTION_ACTIVATED = "BILLING.SUBSCRIPTION.ACTIVATED"
+    SUBSCRIPTION_UPDATED = "BILLING.SUBSCRIPTION.UPDATED"
+    SUBSCRIPTION_EXPIRED = "BILLING.SUBSCRIPTION.EXPIRED"
+    SUBSCRIPTION_CANCELLED = "BILLING.SUBSCRIPTION.CANCELLED"
+    SUBSCRIPTION_SUSPENDED = "BILLING.SUBSCRIPTION.SUSPENDED"
+
+
+class WebhookData(BaseModel):
+    id: str
+    event_type: str
+    resource: "WebhookResource"
+
+
+class WebhookResource(BaseModel):
+    id: str
+    plan_id: str
     status: str
