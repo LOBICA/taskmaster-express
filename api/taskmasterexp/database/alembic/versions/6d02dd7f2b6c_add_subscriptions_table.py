@@ -23,7 +23,7 @@ def upgrade() -> None:
         "subscriptions",
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.Column("is_active", sa.Boolean(), nullable=False),
-        sa.Column("order_id", sa.String(), nullable=True),
+        sa.Column("subscription_id", sa.String(), nullable=True),
         sa.Column("plan_id", sa.String(), nullable=True),
         sa.Column("uuid", sa.Uuid(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),

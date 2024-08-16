@@ -51,9 +51,11 @@ export class PaypalButtonComponent implements OnInit {
              });
            },
           onApprove: function(data, actions) {
-            subscriptionService.linkSubscription(data.orderID).subscribe(() => {
-              subscriptionService.checkSubscriptionStatus();
-            });
+            if (data.subscriptionID) {
+              subscriptionService.linkSubscription(data.subscriptionID).subscribe(() => {
+                subscriptionService.checkSubscriptionStatus();
+              });
+            }
             return Promise.resolve();
           },
          }).render('#paypal-button-container');

@@ -1,6 +1,6 @@
 from taskmasterexp.database.managers import SubscriptionManager
 
-ORDER_ID = "I-HBMDL8PL8571"
+SUBSCRIPTION_ID = "I-HBMDL8PL8571"
 
 
 async def test_subscription_status(
@@ -10,7 +10,7 @@ async def test_subscription_status(
     assert response.status_code == 200
     assert response.json()["isActive"] is False
 
-    await subscription_manager.link_subscription(test_admin_user.uuid, ORDER_ID)
+    await subscription_manager.link_subscription(test_admin_user.uuid, SUBSCRIPTION_ID)
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
     assert response.json()["isActive"] is False
@@ -24,11 +24,13 @@ async def test_subscription_status(
 async def test_link_subscription(
     test_admin_client, subscription_manager: SubscriptionManager
 ):
-    response = test_admin_client.post("/subscriptions/link", json={"orderId": ORDER_ID})
+    response = test_admin_client.post(
+        "/subscriptions/link", json={"subscriptionId": SUBSCRIPTION_ID}
+    )
     assert response.status_code == 200
     assert response.json()["isActive"] is False
 
-    await subscription_manager.activate_subscription(ORDER_ID, "plan_id")
+    await subscription_manager.activate_subscription(SUBSCRIPTION_ID, "plan_id")
 
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200
@@ -38,8 +40,8 @@ async def test_link_subscription(
 async def test_cancel_subscription(
     test_admin_client, test_admin_user, subscription_manager: SubscriptionManager
 ):
-    await subscription_manager.link_subscription(test_admin_user.uuid, ORDER_ID)
-    await subscription_manager.activate_subscription(ORDER_ID, "plan_id")
+    await subscription_manager.link_subscription(test_admin_user.uuid, SUBSCRIPTION_ID)
+    await subscription_manager.activate_subscription(SUBSCRIPTION_ID, "plan_id")
 
     response = test_admin_client.get("/subscriptions/status")
     assert response.status_code == 200

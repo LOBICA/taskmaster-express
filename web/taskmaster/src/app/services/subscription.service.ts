@@ -22,8 +22,8 @@ export class SubscriptionService {
     return this.http.get<Subscription>(`${environment.apiUrl}/subscriptions/status`);
   }
 
-  linkSubscription(orderId: string): Observable<Subscription> {
-    return this.http.post<Subscription>(`${environment.apiUrl}/subscriptions/link`, { orderId });
+  linkSubscription(subscriptionId: string): Observable<Subscription> {
+    return this.http.post<Subscription>(`${environment.apiUrl}/subscriptions/link`, { subscriptionId });
   }
 
   cancelSubscription(): Observable<Subscription> {

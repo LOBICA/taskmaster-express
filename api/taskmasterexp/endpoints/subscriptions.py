@@ -31,7 +31,7 @@ async def link_subscription_to_user(
     payload: SubscriptionPayload,
 ):
     subscription = await subscriptions_manager.link_subscription(
-        current_user.uuid, payload.order_id
+        current_user.uuid, payload.subscription_id
     )
     return SubscriptionResponse(**subscription.dict())
 
@@ -45,5 +45,5 @@ async def cancel_subscription(
     subscription = await subscriptions_manager.get_active_subscription(
         current_user.uuid
     )
-    await paypal_client.cancel_subscription(subscription.order_id)
-    await subscriptions_manager.cancel_subscription(subscription.order_id)
+    await paypal_client.cancel_subscription(subscription.subscription_id)
+    await subscriptions_manager.cancel_subscription(subscription.subscription_id)

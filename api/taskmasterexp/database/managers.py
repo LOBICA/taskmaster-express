@@ -169,8 +169,12 @@ class TaskManager(BaseManager):
 
 
 class SubscriptionManager(BaseManager):
-    async def get_subscription_by_order_id(self, order_id: str) -> Subscription | None:
-        stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
+    async def get_subscription_by_subscription_id(
+        self, subscription_id: str
+    ) -> Subscription | None:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
         results = await self.session.execute(stmt)
         model = results.scalar_one_or_none()
         if model:
@@ -178,23 +182,31 @@ class SubscriptionManager(BaseManager):
 
         return None
 
-    async def link_subscription(self, user_id: UUID, order_id: str) -> Subscription:
-        stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
+    async def link_subscription(
+        self, user_id: UUID, subscription_id: str
+    ) -> Subscription:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
         results = await self.session.execute(stmt)
         subscription = results.scalar_one_or_none()
         if subscription:
             subscription.user_id = user_id
         else:
             subscription = SubscriptionModel(
-                user_id=user_id, order_id=order_id, is_active=False
+                user_id=user_id, subscription_id=subscription_id, is_active=False
             )
             self.session.add(subscription)
         await self.session.commit()
         await self.session.refresh(subscription)
         return Subscription.from_orm(subscription)
 
-    async def activate_subscription(self, order_id: str, plan_id: str) -> Subscription:
-        stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
+    async def activate_subscription(
+        self, subscription_id: str, plan_id: str
+    ) -> Subscription:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
         results = await self.session.execute(stmt)
         subscription = results.scalar_one_or_none()
         if subscription:
@@ -202,7 +214,7 @@ class SubscriptionManager(BaseManager):
             subscription.plan_id = plan_id
         else:
             subscription = SubscriptionModel(
-                order_id=order_id, is_active=True, plan_id=plan_id
+                subscription_id=subscription_id, is_active=True, plan_id=plan_id
             )
             self.session.add(subscription)
 
@@ -210,9 +222,9 @@ class SubscriptionManager(BaseManager):
         await self.session.refresh(subscription)
         return Subscription.from_orm(subscription)
 
-    async def cancel_subscription(self, order_id: str) -> None:
+    async def cancel_subscription(self, subscription_id: str) -> None:
         stmt = select(SubscriptionModel).where(
-            SubscriptionModel.order_id == order_id,
+            SubscriptionModel.subscription_id == subscription_id,
             SubscriptionModel.is_active == true(),
         )
         results = await self.session.execute(stmt)

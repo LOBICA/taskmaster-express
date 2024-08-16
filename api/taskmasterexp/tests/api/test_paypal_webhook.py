@@ -29,7 +29,7 @@ async def test_activate_subscription(
     response = test_admin_client.post("/paypal/webhooks/subscription", json=data.dict())
     assert response.status_code == 200
 
-    subscription = await subscription_manager.get_subscription_by_order_id(
+    subscription = await subscription_manager.get_subscription_by_subscription_id(
         "I-1234567890"
     )
     assert subscription is not None
@@ -57,7 +57,7 @@ async def test_cancel_subscription(
     response = test_admin_client.post("/paypal/webhooks/subscription", json=data.dict())
     assert response.status_code == 200
 
-    subscription = await subscription_manager.get_subscription_by_order_id(
+    subscription = await subscription_manager.get_subscription_by_subscription_id(
         "I-1234567890"
     )
     assert subscription is not None

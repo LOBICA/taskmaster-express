@@ -66,7 +66,7 @@ class SubscriptionModel(BaseModel):
 
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    order_id: Mapped[str | None]
+    subscription_id: Mapped[str | None]
     plan_id: Mapped[str | None]
 
 

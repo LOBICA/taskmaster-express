@@ -17,7 +17,7 @@ class SubscriptionResponse(SubscriptionData):
 class Subscription(SubscriptionData):
     uuid: UUID
     user_id: UUID | None
-    order_id: str
+    subscription_id: str
     plan_id: str | None
 
     class Config:
@@ -26,4 +26,4 @@ class Subscription(SubscriptionData):
 
 
 class SubscriptionPayload(BaseModel):
-    order_id: str = Field(..., alias="orderId")
+    subscription_id: str = Field(..., alias="subscriptionId")
