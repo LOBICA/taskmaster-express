@@ -53,7 +53,8 @@ export class PaypalButtonComponent implements OnInit {
           onApprove: function(data, actions) {
             if (data.subscriptionID) {
               subscriptionService.linkSubscription(data.subscriptionID).subscribe(() => {
-                subscriptionService.checkSubscriptionStatus();
+                // Forcing subscription to be active to avoid waiting too much for webhook
+                subscriptionService.activeSubscription$.next(true);
               });
             }
             return Promise.resolve();
