@@ -168,6 +168,15 @@ class TaskManager(BaseManager):
 
 
 class SubscriptionManager(BaseManager):
+    async def get_subscription_by_order_id(self, order_id: str) -> Subscription | None:
+        stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
+        results = await self.session.execute(stmt)
+        model = results.scalar_one_or_none()
+        if model:
+            return Subscription.from_orm(model)
+
+        return None
+
     async def add_subscription(self, user_id: UUID, order_id: str) -> Subscription:
         stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
         results = await self.session.execute(stmt)

@@ -68,3 +68,6 @@ class WebhookResource(BaseModel):
     id: str
     plan_id: str
     status: str
+
+
+WebhookData.update_forward_refs()
