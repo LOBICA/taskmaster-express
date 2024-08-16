@@ -11,7 +11,7 @@ async def test_activate_subscription(
     )
     assert subscription is None
 
-    subscription = await subscription_manager.add_subscription(
+    subscription = await subscription_manager.link_subscription(
         test_admin_user.uuid, ORDER_ID
     )
     assert subscription.order_id == ORDER_ID
@@ -39,7 +39,7 @@ async def test_race_condition(
     assert subscription.is_active == True
     assert subscription.user_id is None
 
-    subscription = await subscription_manager.add_subscription(
+    subscription = await subscription_manager.link_subscription(
         test_admin_user.uuid, ORDER_ID
     )
     assert subscription.order_id == ORDER_ID
@@ -59,7 +59,7 @@ async def test_cancel_subscription(
     )
     assert subscription is None
 
-    subscription = await subscription_manager.add_subscription(
+    subscription = await subscription_manager.link_subscription(
         test_admin_user.uuid, ORDER_ID
     )
     assert subscription.order_id == ORDER_ID

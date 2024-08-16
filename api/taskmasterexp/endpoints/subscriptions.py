@@ -24,13 +24,13 @@ async def get_subscription_status(
     return SubscriptionResponse(is_active=False)
 
 
-@router.post("/activate", response_model=SubscriptionResponse)
-async def activate_subscription(
+@router.post("/link", response_model=SubscriptionResponse)
+async def link_subscription_to_user(
     current_user: CurrentUser,
     subscriptions_manager: SubscriptionManager,
     payload: SubscriptionPayload,
 ):
-    subscription = await subscriptions_manager.add_subscription(
+    subscription = await subscriptions_manager.link_subscription(
         current_user.uuid, payload.order_id
     )
     return SubscriptionResponse(**subscription.dict())

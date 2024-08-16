@@ -177,7 +177,7 @@ class SubscriptionManager(BaseManager):
 
         return None
 
-    async def add_subscription(self, user_id: UUID, order_id: str) -> Subscription:
+    async def link_subscription(self, user_id: UUID, order_id: str) -> Subscription:
         stmt = select(SubscriptionModel).where(SubscriptionModel.order_id == order_id)
         results = await self.session.execute(stmt)
         subscription = results.scalar_one_or_none()
