@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { LoginformComponent } from './components/loginform/loginform.component';
 import { RegisterformComponent } from './components/registerform/registerform.component';
 import { FacebookLoginComponent } from './components/facebook-login/facebook-login.component';
+import { SubscriptionBannerComponent } from './components/subscription-banner/subscription-banner.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { LoginService } from './services/login.service';
@@ -26,6 +27,7 @@ import { UserService } from './services/user.service';
     LoginformComponent,
     RegisterformComponent,
     FacebookLoginComponent,
+    SubscriptionBannerComponent,
     TasksComponent,
     ChatComponent,
   ],

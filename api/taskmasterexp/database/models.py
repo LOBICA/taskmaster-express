@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.sql.expression import true
 
 from taskmasterexp.schemas.tasks import TaskMood, TaskStatus
 
@@ -33,6 +34,10 @@ class UserModel(BaseModel):
     fb_user_id: Mapped[str | None]
     fb_access_token: Mapped[str | None]
 
+    subscription: Mapped["SubscriptionModel"] = relationship(
+        back_populates="user", cascade="all, delete"
+    )
+
     tasks: Mapped[list["TaskModel"]] = relationship(
         back_populates="user", cascade="all, delete"
     )
@@ -47,6 +52,22 @@ class UserModel(BaseModel):
             return False
 
         return pwd_context.verify(password, self.password)
+
+    def has_active_subscription(self):
+        results = self.subscription.filter(SubscriptionModel.active == true()).all()
+        return len(results) > 0
+
+
+class SubscriptionModel(BaseModel):
+    __tablename__ = "subscriptions"
+
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.uuid"))
+    user: Mapped["UserModel"] = relationship(back_populates="subscription")
+
+    is_active: Mapped[bool] = mapped_column(default=True)
+
+    subscription_id: Mapped[str | None]
+    plan_id: Mapped[str | None]
 
 
 class TaskModel(BaseModel):

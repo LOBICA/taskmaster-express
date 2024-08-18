@@ -4,12 +4,14 @@ from uuid import UUID
 
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import true
 
 from taskmasterexp.database.connection import get_engine, get_session
+from taskmasterexp.schemas.subscriptions import Subscription
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
 
-from .models import TaskModel, UserModel
+from .models import SubscriptionModel, TaskModel, UserModel
 
 
 class BaseManager:
@@ -164,3 +166,81 @@ class TaskManager(BaseManager):
         if model:
             await self.session.delete(model)
             await self.session.commit()
+
+
+class SubscriptionManager(BaseManager):
+    async def get_subscription_by_subscription_id(
+        self, subscription_id: str
+    ) -> Subscription | None:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
+        results = await self.session.execute(stmt)
+        model = results.scalar_one_or_none()
+        if model:
+            return Subscription.from_orm(model)
+
+        return None
+
+    async def link_subscription(
+        self, user_id: UUID, subscription_id: str
+    ) -> Subscription:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
+        results = await self.session.execute(stmt)
+        subscription = results.scalar_one_or_none()
+        if subscription:
+            subscription.user_id = user_id
+        else:
+            subscription = SubscriptionModel(
+                user_id=user_id, subscription_id=subscription_id, is_active=False
+            )
+            self.session.add(subscription)
+        await self.session.commit()
+        await self.session.refresh(subscription)
+        return Subscription.from_orm(subscription)
+
+    async def activate_subscription(
+        self, subscription_id: str, plan_id: str
+    ) -> Subscription:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id
+        )
+        results = await self.session.execute(stmt)
+        subscription = results.scalar_one_or_none()
+        if subscription:
+            subscription.is_active = True
+            subscription.plan_id = plan_id
+        else:
+            subscription = SubscriptionModel(
+                subscription_id=subscription_id, is_active=True, plan_id=plan_id
+            )
+            self.session.add(subscription)
+
+        await self.session.commit()
+        await self.session.refresh(subscription)
+        return Subscription.from_orm(subscription)
+
+    async def cancel_subscription(self, subscription_id: str) -> None:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.subscription_id == subscription_id,
+            SubscriptionModel.is_active == true(),
+        )
+        results = await self.session.execute(stmt)
+        subscription = results.scalar_one_or_none()
+        if subscription:
+            subscription.is_active = False
+            await self.session.commit()
+
+    async def get_active_subscription(self, user_id: UUID) -> Subscription | None:
+        stmt = select(SubscriptionModel).where(
+            SubscriptionModel.user_id == user_id,
+            SubscriptionModel.is_active == true(),
+        )
+        results = await self.session.execute(stmt)
+        model = results.scalar_one_or_none()
+        if model:
+            return Subscription.from_orm(model)
+
+        return None

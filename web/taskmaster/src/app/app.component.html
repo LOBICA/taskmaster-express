@@ -9,6 +9,7 @@
         <a mat-menu-item routerLink="/"><mat-icon>home</mat-icon> Home</a>
         @if (loggedIn) {
           <a mat-menu-item routerLink="/profile"><mat-icon>account_circle</mat-icon> Profile</a>
+          <a mat-menu-item routerLink="/subscription"><mat-icon>credit_card</mat-icon> Subscription</a>
           <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>Logout</button>
         }
       </mat-menu>

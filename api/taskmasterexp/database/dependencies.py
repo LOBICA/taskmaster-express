@@ -30,4 +30,14 @@ async def inject_user_manager(session: DBSession):
 
 UserManager = Annotated[managers.UserManager, Depends(inject_user_manager)]
 
+
+async def inject_subscriptions_manager(session: DBSession):
+    return managers.SubscriptionManager(session)
+
+
+SubscriptionManager = Annotated[
+    managers.SubscriptionManager, Depends(inject_subscriptions_manager)
+]
+
+
 Redis = Annotated[redis.Redis, Depends(get_redis)]

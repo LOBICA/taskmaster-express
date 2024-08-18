@@ -1,0 +1,21 @@
+@if (subscriptionIsActive) {
+  <p>Thanks for subscribing</p>
+  <button mat-flat-button color="warn" (click)="cancelSubscription()">Cancel Subscription</button>
+}
+@else {
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Founder's Subscription</mat-card-title>
+    <mat-card-subtitle>Available for a limited time</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Subscribe now to get a lifetime monthly price of $2.99 including all future features!</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <app-paypal-button
+      [clientId]="paypalClientId"
+      [planId]="paypalPlanId"
+    />
+  </mat-card-actions>
+</mat-card>
+}
