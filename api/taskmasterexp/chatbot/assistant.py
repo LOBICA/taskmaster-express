@@ -7,7 +7,7 @@ from taskmasterexp.auth.dependencies import CurrentUserWA, CurrentUserWS
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
 
-from .client import chat_model
+from .client import get_chat_model
 from .tools import tools
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
 
     chat_prompt = ChatPromptTemplate.from_messages(messages)
 
-    agent = create_openai_tools_agent(chat_model, tools, chat_prompt)
+    agent = create_openai_tools_agent(get_chat_model(), tools, chat_prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
     return agent_executor
