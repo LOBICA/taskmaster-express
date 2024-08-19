@@ -1,6 +1,6 @@
 name: Unit Tests
 
-on: [push, pull_request]
+on: pull_request
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
           poetry install
       - name: Add environment variables
         run: |
-          export SECRET_KEY="mysecretkey"
+          echo "SECRET_KEY=mysecretkey" >> .env
       - name: Run tests
         run: |
           poetry run pytest .

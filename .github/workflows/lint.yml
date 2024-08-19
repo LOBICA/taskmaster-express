@@ -1,6 +1,6 @@
 name: Lint Code
 
-on: [push, pull_request]
+on: pull_request
 
 jobs:
   build:
@@ -23,9 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-      - name: Add environment variables
-        run: |
-          export SECRET_KEY="mysecretkey"
-      - name: Run tests
+      - name: Run linters
         run: |
           poetry run sh scripts/lint.sh
