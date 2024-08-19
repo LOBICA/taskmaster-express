@@ -14,12 +14,20 @@ from .dependencies import ChatHistoryWA, WhatsAppAgent
 
 logger = logging.getLogger(__name__)
 
-client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
 router = APIRouter(prefix="/messages", tags=["messages"])
+
+_client = None
+
+
+def get_twilio_client():
+    global _client
+    if _client is None:
+        _client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    return _client
 
 
 def _send_message(text: str, destination: str):
+    client = get_twilio_client()
     client.messages.create(
         from_=f"whatsapp:{WHATSAPP_NUMBER}", body=text, to=destination
     )
