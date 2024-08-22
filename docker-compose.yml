@@ -16,13 +16,6 @@ services:
     depends_on:
       - db
       - redis
-  lint:
-    image: taskmaster-express-api
-    env_file: .env
-    command: "sh scripts/lint.sh"
-    profiles: [ "test" ]
-    volumes:
-      - .:/usr/src/app
   test:
     image: taskmaster-express-api
     env_file: .env
