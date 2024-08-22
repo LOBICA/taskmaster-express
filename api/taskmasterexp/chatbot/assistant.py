@@ -40,7 +40,7 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
         ("system", f"The user's uuid is {user.uuid}"),
         ("human", f"My name is {user.name}"),
         ("system", f"The task format is: <{Task.ai_format_template()}>"),
-        ("system", "You will list the tasks as: <\n1.[title]\n2.[title]\n...>"),
+        ("system", "You will list the tasks as: \n1.[title]\n2.[title]\n..."),
         ("system", "If the task list is empty you will say that there are no tasks"),
         (
             "system",
@@ -48,7 +48,14 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
             f"you will present them as {task_template}.",
         ),
         ("system", "Greet back the user, only provide task information if asked"),
-        ("system", "Always reference the updated list of tasks"),
+        (
+            "system",
+            "Always get the task's updated information before providing information "
+            "or interacting with the task, use the 'get_task_list' tool to get "
+            "the list of tasks, or the 'get_task' tool to get a specific task, "
+            "and always use the task's uuid as the task_id to interact with "
+            "a specific task.",
+        ),
         ("system", email_message),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),
