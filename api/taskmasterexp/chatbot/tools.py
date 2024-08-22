@@ -17,72 +17,89 @@ def get_current_time() -> str:
 
 
 @tool
-async def get_task_list(user_id: str) -> str:
+async def get_task_list(user_id: str) -> str | None:
     """Return the user's pending task list.
 
-    Provided the user's uuid, return the list of tasks for that user.
+    Provided the user's uuid, return the list of tasks for that user,
+    or None if there was an error.
     """
     logger.info(f"Getting task list for user {user_id}")
     async with TaskManager.start_session() as manager:
-        tasks = await manager.list(
-            {
-                "user_id": UUID(user_id),
-                "status": TaskStatus.PENDING,
-            }
-        )
-        tasks_details = ",".join([task.ai_format() for task in tasks])
+        try:
+            tasks = await manager.list(
+                {
+                    "user_id": UUID(user_id),
+                    "status": TaskStatus.PENDING,
+                }
+            )
+            tasks_details = ",".join([task.ai_format() for task in tasks])
+        except Exception:
+            logger.exception(f"Error getting task list for user {user_id}")
+            return None
         logger.info(tasks_details)
 
     return tasks_details
 
 
 @tool
-async def add_new_task(user_id: str, title: str, description: str) -> str:
+async def add_new_task(user_id: str, title: str, description: str) -> str | None:
     """Add a new task for the user.
 
     Provided the user's uuid, the task title, and the task description.
 
-    Returns the newly created task details.
+    Returns the newly created task details, or None if there was an error.
     """
     logger.info(f"Adding new task for user {user_id}")
     async with TaskManager.start_session() as manager:
-        task = Task(user_id=UUID(user_id), title=title, description=description)
-        task = await manager.save(task)
+        try:
+            task = Task(user_id=UUID(user_id), title=title, description=description)
+            task = await manager.save(task)
+        except Exception:
+            logger.exception(f"Error adding new task for user {user_id}")
+            return None
 
     return task.ai_format()
 
 
 @tool
-async def modify_task(task_id: str, title: str, description: str) -> str:
+async def modify_task(task_id: str, title: str, description: str) -> str | None:
     """Change a task title and description
 
     Provided the task's uuid, the new title, and the new description.
 
-    Returns the updated task details.
+    Returns the updated task details, or None if there was an error.
     """
     logger.info(f"Modifying task {task_id}")
     async with TaskManager.start_session() as manager:
-        task = await manager.get(UUID(task_id))
-        task.title = title
-        task.description = description
-        task = await manager.save(task)
+        try:
+            task = await manager.get(UUID(task_id))
+            task.title = title
+            task.description = description
+            task = await manager.save(task)
+        except Exception:
+            logger.exception(f"Error modifying task {task_id}")
+            return None
 
     return task.ai_format()
 
 
 @tool
-async def complete_task(task_id: str) -> str:
+async def complete_task(task_id: str) -> str | None:
     """Mark a task as done.
 
     Provided the task's uuid, mark the task as done.
 
-    Returns the updated task details.
+    Returns the updated task details, or None if there was an error.
     """
     logger.info(f"Completing task {task_id}")
     async with TaskManager.start_session() as manager:
-        task = await manager.get(UUID(task_id))
-        task.status = TaskStatus.DONE
-        await manager.save(task)
+        try:
+            task = await manager.get(UUID(task_id))
+            task.status = TaskStatus.DONE
+            await manager.save(task)
+        except Exception:
+            logger.exception(f"Error completing task {task_id}")
+            return None
 
     return task.ai_format()
 
@@ -92,10 +109,18 @@ async def delete_task(task_id: str):
     """Delete a task.
 
     Provided the task's uuid, delete the task.
+
+    Returns True if the task was deleted, otherwise False.
     """
     logger.info(f"Deleting task {task_id}")
     async with TaskManager.start_session() as manager:
-        await manager.delete(UUID(task_id))
+        try:
+            await manager.delete(UUID(task_id))
+        except Exception:
+            logger.exception(f"Error deleting task {task_id}")
+            return False
+
+        return True
 
 
 @tool
@@ -111,8 +136,8 @@ async def associate_email_to_user(user_id: str, email: str):
     async with UserManager.start_session() as manager:
         try:
             await manager.associate_email(UUID(user_id), email)
-        except Exception as e:
-            logger.exception(e)
+        except Exception:
+            logger.exception(f"Error associating email {email} to user {user_id}")
             return False
 
         return True
