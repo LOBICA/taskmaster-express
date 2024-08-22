@@ -6,11 +6,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./api
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

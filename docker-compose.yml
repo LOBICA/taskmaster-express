@@ -2,7 +2,6 @@ name: "taskmaster-express"
 services:
   api:
     build:
-      context: ./api
       target: dev
     ports:
       - 8001:8001
@@ -13,7 +12,7 @@ services:
       - CORS_ORIGINS=http://localhost:4200,https://taskmaster.local
     command: "sh scripts/launch-api.local.sh"
     volumes:
-      - ./api:/usr/src/app
+      - .:/usr/src/app
     depends_on:
       - db
       - redis
@@ -23,14 +22,14 @@ services:
     command: "sh scripts/lint.sh"
     profiles: [ "test" ]
     volumes:
-      - ./api:/usr/src/app
+      - .:/usr/src/app
   test:
     image: taskmaster-express-api
     env_file: .env
     command: "sh scripts/test.sh"
     profiles: [ "test" ]
     volumes:
-      - ./api:/usr/src/app
+      - .:/usr/src/app
   db:
     image: postgres
     environment:

@@ -20,4 +20,3 @@ jobs:
           heroku_email: "ajavier.lopez@gmail.com"
           usedocker: true
           team: "lobica"
-          appdir: "./api"
