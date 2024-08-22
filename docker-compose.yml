@@ -17,18 +17,6 @@ services:
     depends_on:
       - db
       - redis
-  web:
-    build:
-      context: ./web/taskmaster
-      target: dev
-    ports:
-      - 4200:4200
-    env_file: .env
-    command: "ng serve --host 0.0.0.0 --configuration development"
-    volumes:
-      - ./web/taskmaster/src:/usr/src/app/src
-    depends_on:
-      - api
   lint:
     image: taskmaster-express-api
     env_file: .env
@@ -54,14 +42,3 @@ services:
     image: redis
     ports:
       - "6379:6379"
-  https-portal:
-    image: steveltn/https-portal
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      DOMAINS: 'taskmaster.local -> http://web:4200'
-      STAGE: 'local'
-      WEBSOCKET: true
-    depends_on:
-      - web
