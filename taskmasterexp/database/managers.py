@@ -138,6 +138,8 @@ class TaskManager(BaseManager):
                 stmt = stmt.where(TaskModel.user_id == params["user_id"])
             if "status" in params:
                 stmt = stmt.where(TaskModel.status == params["status"])
+            if "due_date" in params:
+                stmt = stmt.where(TaskModel.due_date == params["due_date"])
         result: Result = await self.session.execute(stmt)
         return [Task.from_orm(model) for model in result.scalars()]
 
@@ -151,7 +153,7 @@ class TaskManager(BaseManager):
     async def save(self, task: Task) -> Task:
         if task.uuid:
             model = await self.session.get(TaskModel, task.uuid)
-            for field, value in task.dict().items():
+            for field, value in task.dict(exclude={"uuid"}).items():
                 setattr(model, field, value)
         else:
             model = TaskModel(**task.dict(exclude={"uuid"}))

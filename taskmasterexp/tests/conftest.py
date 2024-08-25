@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from datetime import date
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -110,7 +111,12 @@ def patch_task_manager(task_manager_generator):
 
 
 @pytest.fixture
-def task_factory():
+def due_date():
+    return date.today().isoformat()
+
+
+@pytest.fixture
+def task_factory(due_date):
     def _task_factory(user: User, n=1):
         tasks = []
         for i in range(n):
@@ -118,6 +124,7 @@ def task_factory():
                 Task(
                     title=f"task {i}",
                     user_id=user.uuid,
+                    due_date=due_date,
                 )
             )
         return tasks

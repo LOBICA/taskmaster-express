@@ -42,6 +42,31 @@ async def get_task_list(user_id: str) -> str | None:
 
 
 @tool
+async def get_tasks_for_date(user_id: str, date: str) -> str | None:
+    """Return the user's tasks for a specific date.
+
+    Provided the user's uuid and the date, return the list of tasks for that user
+    on that date, or None if there was an error.
+    """
+    logger.info(f"Getting tasks for user {user_id} on date {date}")
+    async with TaskManager.start_session() as manager:
+        try:
+            tasks = await manager.list(
+                {
+                    "user_id": UUID(user_id),
+                    "due_date": date,
+                }
+            )
+            tasks_details = ",".join([task.ai_format() for task in tasks])
+        except Exception:
+            logger.exception(f"Error getting tasks for user {user_id} on date {date}")
+            return None
+        logger.info(tasks_details)
+
+    return tasks_details
+
+
+@tool
 async def add_new_task(user_id: str, title: str, description: str) -> str | None:
     """Add a new task for the user.
 

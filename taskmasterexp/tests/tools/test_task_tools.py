@@ -4,7 +4,9 @@ from taskmasterexp.chatbot.tools import (
     add_new_task,
     complete_task,
     delete_task,
+    get_current_time,
     get_task_list,
+    get_tasks_for_date,
     modify_task,
 )
 from taskmasterexp.database.managers import TaskManager
@@ -24,6 +26,32 @@ async def test_task_list_tool(
     with patch_task_manager:
         task_list = await get_task_list.ainvoke({"user_id": str(test_admin_user.uuid)})
         assert task_list == task.ai_format()
+
+
+async def test_get_task_for_date(
+    patch_task_manager,
+    task_manager: TaskManager,
+    task_factory,
+    test_admin_user,
+    due_date,
+):
+    today = await get_current_time.ainvoke({})
+
+    with patch_task_manager:
+        task_list = await get_tasks_for_date.ainvoke(
+            {"user_id": str(test_admin_user.uuid), "date": today}
+        )
+        assert task_list == ""
+
+    task, *_ = task_factory(test_admin_user)
+    task = await task_manager.save(task)
+
+    with patch_task_manager:
+        task_list = await get_tasks_for_date.ainvoke(
+            {"user_id": str(test_admin_user.uuid), "date": due_date}
+        )
+        assert task_list == task.ai_format()
+        assert due_date in task_list
 
 
 async def test_add_new_task_tool(
