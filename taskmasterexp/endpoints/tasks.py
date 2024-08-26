@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, status
@@ -12,7 +13,10 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 @router.get("", response_model=list[TaskResponse])
 async def list_tasks(
-    current_user: CurrentUser, manager: TaskManager, status: str = None
+    current_user: CurrentUser,
+    manager: TaskManager,
+    status: str = None,
+    date: str = None,
 ):
     filter = {
         "user_id": current_user.uuid,
@@ -20,6 +24,9 @@ async def list_tasks(
 
     if status:
         filter["status"] = status
+
+    if date:
+        filter["due_date"] = datetime.date.fromisoformat(date)
 
     tasks = await manager.list(filter)
     return tasks

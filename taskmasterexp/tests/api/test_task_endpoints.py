@@ -19,6 +19,21 @@ async def test_list_tasks(
     assert len(tasks) == task_count
 
 
+async def test_list_tasks_on_date(
+    test_admin_client, test_admin_user, task_factory, task_manager, due_date
+):
+    task_count = 5
+    tasks = task_factory(test_admin_user, task_count)
+    for task in tasks:
+        await task_manager.save(task)
+
+    response = test_admin_client.get("/tasks", params={"date": due_date})
+    assert response.status_code == 200
+    tasks = response.json()
+    assert len(tasks) == task_count
+    assert tasks[0]["due_date"] == due_date
+
+
 async def test_add_task(test_admin_client, test_admin_user, task_factory):
     response = test_admin_client.get("/tasks")
     assert response.status_code == 200
