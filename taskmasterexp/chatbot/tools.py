@@ -1,5 +1,5 @@
+import datetime
 import logging
-from datetime import datetime
 from uuid import UUID
 
 from langchain_core.tools import tool
@@ -13,12 +13,15 @@ logger = logging.getLogger(__name__)
 @tool
 def get_current_time() -> str:
     """Return the current time in ISO format."""
-    return datetime.now().isoformat()
+    return datetime.datetime.now().isoformat()
 
 
 @tool
-async def get_task_list(user_id: str) -> str | None:
+async def get_pending_task_list(user_id: str) -> str | None:
     """Return the user's pending task list.
+
+    This tool doen't return the task for an specific date like "today",
+    if you need tasks for a specific date, use get_tasks_for_date.
 
     Provided the user's uuid, return the list of tasks for that user,
     or None if there was an error.
@@ -43,10 +46,12 @@ async def get_task_list(user_id: str) -> str | None:
 
 @tool
 async def get_tasks_for_date(user_id: str, date: str) -> str | None:
-    """Return the user's tasks for a specific date.
+    """Return the user's tasks for a date provided in isoformat.
 
     Provided the user's uuid and the date, return the list of tasks for that user
     on that date, or None if there was an error.
+
+    Always tell back the user the date that you used to get the tasks.
     """
     logger.info(f"Getting tasks for user {user_id} on date {date}")
     async with TaskManager.start_session() as manager:
@@ -54,7 +59,7 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
             tasks = await manager.list(
                 {
                     "user_id": UUID(user_id),
-                    "due_date": date,
+                    "due_date": datetime.datetime.fromisoformat(date).date(),
                 }
             )
             tasks_details = ",".join([task.ai_format() for task in tasks])
@@ -170,7 +175,8 @@ async def associate_email_to_user(user_id: str, email: str):
 
 tools = [
     get_current_time,
-    get_task_list,
+    get_pending_task_list,
+    get_tasks_for_date,
     add_new_task,
     modify_task,
     complete_task,

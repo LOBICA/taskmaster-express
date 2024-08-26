@@ -5,7 +5,7 @@ from taskmasterexp.chatbot.tools import (
     complete_task,
     delete_task,
     get_current_time,
-    get_task_list,
+    get_pending_task_list,
     get_tasks_for_date,
     modify_task,
 )
@@ -17,14 +17,18 @@ async def test_task_list_tool(
     patch_task_manager, task_manager: TaskManager, task_factory, test_admin_user
 ):
     with patch_task_manager:
-        task_list = await get_task_list.ainvoke({"user_id": str(test_admin_user.uuid)})
+        task_list = await get_pending_task_list.ainvoke(
+            {"user_id": str(test_admin_user.uuid)}
+        )
         assert task_list == ""
 
     task, *_ = task_factory(test_admin_user)
     task = await task_manager.save(task)
 
     with patch_task_manager:
-        task_list = await get_task_list.ainvoke({"user_id": str(test_admin_user.uuid)})
+        task_list = await get_pending_task_list.ainvoke(
+            {"user_id": str(test_admin_user.uuid)}
+        )
         assert task_list == task.ai_format()
 
 
