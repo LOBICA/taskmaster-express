@@ -50,11 +50,20 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
         ("system", "Greet back the user, only provide task information if asked"),
         (
             "system",
+            "When using a tool always use the task's uuid provided by 'get_task_list' "
+            "as the 'task_id'",
+        ),
+        (
+            "system",
             "Always get the task's updated information before providing information "
             "or interacting with the task, use the 'get_task_list' tool to get "
-            "the list of tasks, or the 'get_task' tool to get a specific task, "
-            "and always use the task's uuid as the task_id to interact with "
-            "a specific task.",
+            "the list of tasks, or the 'get_task' tool to get a specific task.",
+        ),
+        (
+            "system",
+            "Only mark a task as done if the user has already done it, "
+            "if the user says that it *will* or *should* do it, set a due date instead."
+            "If you are not sure, ask for confirmation.",
         ),
         ("system", email_message),
         MessagesPlaceholder(variable_name="history"),

@@ -10,10 +10,15 @@ from taskmasterexp.schemas.tasks import Task, TaskStatus
 logger = logging.getLogger(__name__)
 
 
+def _get_weekday() -> str:
+    """Return the current weekday."""
+    return datetime.datetime.now().strftime("%A")
+
+
 @tool
 def get_current_time() -> str:
-    """Return the current time in ISO format."""
-    return datetime.datetime.now().isoformat()
+    """Return the current time in ISO format and the weekday."""
+    return datetime.datetime.now().isoformat() + " " + _get_weekday()
 
 
 @tool
@@ -72,17 +77,28 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
 
 
 @tool
-async def add_new_task(user_id: str, title: str, description: str) -> str | None:
+async def add_new_task(
+    user_id: str, title: str, description: str, due_date: str = None
+) -> str | None:
     """Add a new task for the user.
 
     Provided the user's uuid, the task title, and the task description.
+    It the user specifies a due date, it will be used, otherwise the task will
+    have no due date.
 
     Returns the newly created task details, or None if there was an error.
     """
     logger.info(f"Adding new task for user {user_id}")
     async with TaskManager.start_session() as manager:
         try:
-            task = Task(user_id=UUID(user_id), title=title, description=description)
+            task = Task(
+                user_id=UUID(user_id),
+                title=title,
+                description=description,
+                due_date=datetime.datetime.fromisoformat(due_date).date()
+                if due_date
+                else None,
+            )
             task = await manager.save(task)
         except Exception:
             logger.exception(f"Error adding new task for user {user_id}")
@@ -97,6 +113,8 @@ async def modify_task(task_id: str, title: str, description: str) -> str | None:
 
     Provided the task's uuid, the new title, and the new description.
 
+    If you are required to change the task's due date, use set_task_due_date.
+
     Returns the updated task details, or None if there was an error.
     """
     logger.info(f"Modifying task {task_id}")
@@ -108,6 +126,27 @@ async def modify_task(task_id: str, title: str, description: str) -> str | None:
             task = await manager.save(task)
         except Exception:
             logger.exception(f"Error modifying task {task_id}")
+            return None
+
+    return task.ai_format()
+
+
+@tool
+async def set_task_due_date(task_id: str, due_date: str) -> str | None:
+    """Set or change the due date for a task.
+
+    Provided the task's uuid and the new due date in isoformat.
+
+    Returns the updated task details, or None if there was an error.
+    """
+    logger.info(f"Setting due date {due_date} for task {task_id}")
+    async with TaskManager.start_session() as manager:
+        try:
+            task = await manager.get(UUID(task_id))
+            task.due_date = datetime.datetime.fromisoformat(due_date).date()
+            task = await manager.save(task)
+        except Exception:
+            logger.exception(f"Error setting due date for task {task_id}")
             return None
 
     return task.ai_format()
@@ -179,6 +218,7 @@ tools = [
     get_tasks_for_date,
     add_new_task,
     modify_task,
+    set_task_due_date,
     complete_task,
     delete_task,
     associate_email_to_user,
