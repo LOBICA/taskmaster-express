@@ -1,6 +1,7 @@
+import datetime
 import logging
-from datetime import datetime
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from langchain_core.tools import tool
 
@@ -10,15 +11,24 @@ from taskmasterexp.schemas.tasks import Task, TaskStatus
 logger = logging.getLogger(__name__)
 
 
+def _get_weekday() -> str:
+    """Return the current weekday."""
+    return datetime.datetime.now().strftime("%A")
+
+
 @tool
 def get_current_time() -> str:
-    """Return the current time in ISO format."""
-    return datetime.now().isoformat()
+    """Return the current time in ISO format and the weekday."""
+    zone = ZoneInfo("America/Los_Angeles")
+    return datetime.datetime.now(tz=zone).isoformat() + " " + _get_weekday()
 
 
 @tool
-async def get_task_list(user_id: str) -> str | None:
+async def get_pending_task_list(user_id: str) -> str | None:
     """Return the user's pending task list.
+
+    This tool doen't return the task for an specific date like "today",
+    if you need tasks for a specific date, use get_tasks_for_date.
 
     Provided the user's uuid, return the list of tasks for that user,
     or None if there was an error.
@@ -42,17 +52,56 @@ async def get_task_list(user_id: str) -> str | None:
 
 
 @tool
-async def add_new_task(user_id: str, title: str, description: str) -> str | None:
+async def get_tasks_for_date(user_id: str, date: str) -> str | None:
+    """Return the user's tasks for a date provided in isoformat.
+
+    Provided the user's uuid and the date, return the list of tasks for that user
+    on that date, or None if there was an error.
+
+    Always tell back the user the date that you used to get the tasks.
+    """
+    logger.info(f"Getting tasks for user {user_id} on date {date}")
+    async with TaskManager.start_session() as manager:
+        try:
+            tasks = await manager.list(
+                {
+                    "user_id": UUID(user_id),
+                    "due_date": datetime.datetime.fromisoformat(date).date(),
+                }
+            )
+            tasks_details = ",".join([task.ai_format() for task in tasks])
+        except Exception:
+            logger.exception(f"Error getting tasks for user {user_id} on date {date}")
+            return None
+        logger.info(tasks_details)
+
+    return tasks_details
+
+
+@tool
+async def add_new_task(
+    user_id: str, title: str, description: str, due_date: str = None
+) -> str | None:
     """Add a new task for the user.
 
     Provided the user's uuid, the task title, and the task description.
+    It the user specifies a due date, it will be used, otherwise the task will
+    have no due date.
 
     Returns the newly created task details, or None if there was an error.
     """
     logger.info(f"Adding new task for user {user_id}")
     async with TaskManager.start_session() as manager:
         try:
-            task = Task(user_id=UUID(user_id), title=title, description=description)
+            if due_date:
+                due_date = datetime.datetime.fromisoformat(due_date).date()
+
+            task = Task(
+                user_id=UUID(user_id),
+                title=title,
+                description=description,
+                due_date=due_date,
+            )
             task = await manager.save(task)
         except Exception:
             logger.exception(f"Error adding new task for user {user_id}")
@@ -67,6 +116,8 @@ async def modify_task(task_id: str, title: str, description: str) -> str | None:
 
     Provided the task's uuid, the new title, and the new description.
 
+    If you are required to change the task's due date, use set_task_due_date.
+
     Returns the updated task details, or None if there was an error.
     """
     logger.info(f"Modifying task {task_id}")
@@ -78,6 +129,27 @@ async def modify_task(task_id: str, title: str, description: str) -> str | None:
             task = await manager.save(task)
         except Exception:
             logger.exception(f"Error modifying task {task_id}")
+            return None
+
+    return task.ai_format()
+
+
+@tool
+async def set_task_due_date(task_id: str, due_date: str) -> str | None:
+    """Set or change the due date for a task.
+
+    Provided the task's uuid and the new due date in isoformat.
+
+    Returns the updated task details, or None if there was an error.
+    """
+    logger.info(f"Setting due date {due_date} for task {task_id}")
+    async with TaskManager.start_session() as manager:
+        try:
+            task = await manager.get(UUID(task_id))
+            task.due_date = datetime.datetime.fromisoformat(due_date).date()
+            task = await manager.save(task)
+        except Exception:
+            logger.exception(f"Error setting due date for task {task_id}")
             return None
 
     return task.ai_format()
@@ -145,9 +217,11 @@ async def associate_email_to_user(user_id: str, email: str):
 
 tools = [
     get_current_time,
-    get_task_list,
+    get_pending_task_list,
+    get_tasks_for_date,
     add_new_task,
     modify_task,
+    set_task_due_date,
     complete_task,
     delete_task,
     associate_email_to_user,

@@ -1,4 +1,6 @@
+import logging
 from contextlib import asynccontextmanager
+from datetime import date
 from typing import Any, AsyncGenerator, Self
 from uuid import UUID
 
@@ -12,6 +14,8 @@ from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
 
 from .models import SubscriptionModel, TaskModel, UserModel
+
+logger = logging.getLogger(__name__)
 
 
 class BaseManager:
@@ -138,6 +142,13 @@ class TaskManager(BaseManager):
                 stmt = stmt.where(TaskModel.user_id == params["user_id"])
             if "status" in params:
                 stmt = stmt.where(TaskModel.status == params["status"])
+            if "due_date" in params:
+                if isinstance(params["due_date"], date):
+                    stmt = stmt.where(TaskModel.due_date == params["due_date"])
+                else:
+                    logger.error(f"Invalid due date type {type(params['due_date'])}")
+                    return []
+
         result: Result = await self.session.execute(stmt)
         return [Task.from_orm(model) for model in result.scalars()]
 
@@ -151,7 +162,7 @@ class TaskManager(BaseManager):
     async def save(self, task: Task) -> Task:
         if task.uuid:
             model = await self.session.get(TaskModel, task.uuid)
-            for field, value in task.dict().items():
+            for field, value in task.dict(exclude={"uuid"}).items():
                 setattr(model, field, value)
         else:
             model = TaskModel(**task.dict(exclude={"uuid"}))
