@@ -146,7 +146,9 @@ class TaskManager(BaseManager):
                 if isinstance(params["due_date"], date):
                     stmt = stmt.where(TaskModel.due_date == params["due_date"])
                 else:
-                    logger.warning(f"Invalid due date type {type(params['due_date'])}")
+                    logger.error(f"Invalid due date type {type(params['due_date'])}")
+                    return []
+
         result: Result = await self.session.execute(stmt)
         return [Task.from_orm(model) for model in result.scalars()]
 

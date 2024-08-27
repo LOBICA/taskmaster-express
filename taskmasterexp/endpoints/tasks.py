@@ -16,7 +16,7 @@ async def list_tasks(
     current_user: CurrentUser,
     manager: TaskManager,
     status: str = None,
-    date: str = None,
+    date: datetime.date = None,
 ):
     filter = {
         "user_id": current_user.uuid,
@@ -26,7 +26,7 @@ async def list_tasks(
         filter["status"] = status
 
     if date:
-        filter["due_date"] = datetime.date.fromisoformat(date)
+        filter["due_date"] = date
 
     tasks = await manager.list(filter)
     return tasks

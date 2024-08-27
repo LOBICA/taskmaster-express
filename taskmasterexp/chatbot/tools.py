@@ -1,6 +1,7 @@
 import datetime
 import logging
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from langchain_core.tools import tool
 
@@ -18,7 +19,8 @@ def _get_weekday() -> str:
 @tool
 def get_current_time() -> str:
     """Return the current time in ISO format and the weekday."""
-    return datetime.datetime.now().isoformat() + " " + _get_weekday()
+    zone = ZoneInfo("America/Los_Angeles")
+    return datetime.datetime.now(tz=zone).isoformat() + " " + _get_weekday()
 
 
 @tool
@@ -91,13 +93,14 @@ async def add_new_task(
     logger.info(f"Adding new task for user {user_id}")
     async with TaskManager.start_session() as manager:
         try:
+            if due_date:
+                due_date = datetime.datetime.fromisoformat(due_date).date()
+
             task = Task(
                 user_id=UUID(user_id),
                 title=title,
                 description=description,
-                due_date=datetime.datetime.fromisoformat(due_date).date()
-                if due_date
-                else None,
+                due_date=due_date,
             )
             task = await manager.save(task)
         except Exception:
