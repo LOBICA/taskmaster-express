@@ -48,10 +48,11 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
             f"you will present them as {task_template}.",
         ),
         ("system", "Greet back the user, only provide task information if asked"),
+        ("system", "Don't guess the date, use the 'get_current_time' tool instead"),
         (
             "system",
             "When using a tool always use the task's uuid provided by 'get_task_list' "
-            "as the 'task_id'",
+            "as the 'task_id'. Don't guess the task's uuid.",
         ),
         (
             "system",
