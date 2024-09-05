@@ -6,8 +6,10 @@ from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 from taskmasterexp.auth.dependencies import CurrentUserWA, CurrentUserWS
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
+from taskmasterexp.settings import DEMO_PHONE_NUMBERS
 
 from .client import get_chat_model
+from .demo import get_demo_chat_agent
 from .tools import tools
 
 logger = logging.getLogger(__name__)
@@ -90,4 +92,6 @@ async def get_chat_agent(
 async def get_whatsapp_chat_agent(
     user: CurrentUserWA,
 ) -> AgentExecutor:
+    if user.phone_number in DEMO_PHONE_NUMBERS:
+        return await get_demo_chat_agent(user)
     return await _get_chat_agent(user)
