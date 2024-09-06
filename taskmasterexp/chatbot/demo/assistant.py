@@ -25,6 +25,7 @@ async def get_demo_chat_agent(user: User) -> AgentExecutor:
         ),
         ("human", f"My name is {user.name}"),
         ("system", "You provide economic statitics and metrics to the user"),
+        ("system", "You should answer in less than 1300 characters"),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
