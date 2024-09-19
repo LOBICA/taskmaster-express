@@ -4,6 +4,7 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 
 from taskmasterexp.schemas.users import User
+from taskmasterexp.settings import DEMO_TOPIC
 
 from ..client import get_chat_model
 from ..tools import get_current_time
@@ -24,7 +25,7 @@ async def get_demo_chat_agent(user: User) -> AgentExecutor:
             "You are doing a demo for the user and you will tell them that this is a demo",
         ),
         ("human", f"My name is {user.name}"),
-        ("system", "You provide economic statitics and metrics to the user"),
+        ("system", f"You are an expert on {DEMO_TOPIC}"),
         ("system", "You should answer in less than 1300 characters"),
         MessagesPlaceholder(variable_name="history"),
         ("human", human_template),

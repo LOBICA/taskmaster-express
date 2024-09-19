@@ -31,3 +31,4 @@ PAYPAL_WEBHOOK_ID = os.getenv("PAYPAL_WEBHOOK_ID")
 DEMO_PHONE_NUMBERS = [
     phone.strip() for phone in os.getenv("DEMO_PHONE_NUMBERS", "").split(",")
 ]
+DEMO_TOPIC = os.getenv("DEMO_TOPIC", "economy")
