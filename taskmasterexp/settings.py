@@ -28,3 +28,7 @@ PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_SECRET_KEY = os.getenv("PAYPAL_SECRET_KEY")
 PAYPAL_API_URL = os.getenv("PAYPAL_API_URL", "https://api-m.sandbox.paypal.com")
 PAYPAL_WEBHOOK_ID = os.getenv("PAYPAL_WEBHOOK_ID")
+DEMO_PHONE_NUMBERS = [
+    phone.strip() for phone in os.getenv("DEMO_PHONE_NUMBERS", "").split(",")
+]
+DEMO_TOPIC = os.getenv("DEMO_TOPIC", "economy")
