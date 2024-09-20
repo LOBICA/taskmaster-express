@@ -7,7 +7,7 @@ from fastapi.responses import PlainTextResponse
 
 from . import __version__
 from .auth.endpoints import router as auth_endpoints
-from .chatbot import messages, ws
+from .chatbot import demo, messages, ws
 from .endpoints import subscriptions, tasks, users
 from .paypal import webhooks
 from .settings import CORS_ORIGINS
@@ -42,3 +42,4 @@ app.include_router(subscriptions.router)
 app.include_router(ws.router)
 app.include_router(messages.router)
 app.include_router(webhooks.router)
+app.include_router(demo.router)
