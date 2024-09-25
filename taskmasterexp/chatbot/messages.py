@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Annotated
 
@@ -26,6 +27,21 @@ def get_twilio_client():
     return _client
 
 
+async def _send_split_message(text: str, destination: str):
+    messages = []
+    char_count = 0
+    for paragraph in text.split("\n"):
+        char_count += len(paragraph)
+        if char_count > 1300:
+            _send_message("\n".join(messages), destination=destination)
+            messages = []
+            char_count = len(paragraph)
+            # Add a delay between messages
+            await asyncio.sleep(1)
+        messages.append(paragraph)
+    _send_message("\n".join(messages), destination=destination)
+
+
 def _send_message(text: str, destination: str):
     client = get_twilio_client()
     client.messages.create(
@@ -48,6 +64,9 @@ async def receive_message(
             "text": Body,
         }
     )
-    _send_message(response["output"], destination=From)
+    if len(response["output"]) > 1300:
+        _send_split_message(response["output"], destination=From)
+    else:
+        _send_message(response["output"], destination=From)
     await history.add_message("human", Body)
     await history.add_message("ai", response["output"])
