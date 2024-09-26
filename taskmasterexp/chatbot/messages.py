@@ -43,8 +43,8 @@ def _send_message(client: TwilioClient, text: str, destination: str):
 
 
 async def _invoke_agent(agent: WhatsAppAgent, history: ChatHistoryWA, text: str):
-    messages = history.get_messages()
-    response = agent.ainvoke(
+    messages = await history.get_messages()
+    response = await agent.ainvoke(
         {
             "history": messages,
             "text": text,
