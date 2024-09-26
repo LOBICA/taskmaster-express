@@ -17,7 +17,7 @@ In finibus tellus mi, nec feugiat lacus posuere ut. Curabitur ornare dui erat, v
 async def test_send_split_message(mock_send_message):
     result_text = []
 
-    def _send_message(text: str, destination: str):
+    def _send_message(_, text: str, destination: str):
         result_text.append(text)
         assert len(text) <= 1300
         assert destination == "1234567890"
@@ -27,7 +27,7 @@ async def test_send_split_message(mock_send_message):
     assert len(TEXT) > 1300
     assert mock_send_message.call_count == 0
 
-    await _send_split_message(TEXT, "1234567890")
+    await _send_split_message(None, TEXT, "1234567890")
 
     mock_send_message.assert_called()
     assert TEXT == "\n".join(result_text)
@@ -40,4 +40,17 @@ async def test_send_split_message_long_paragraph(mock_send_message):
     assert len(text) > 1300
 
     with raises(MessageTooLongError):
-        await _send_split_message(text, "1234567890")
+        await _send_split_message(None, text, "1234567890")
+
+
+def test_webhook(test_client, mock_twilio_client):
+    mock_twilio_client.messages.create.assert_not_called()
+    response = test_client.post(
+        "/messages/webhook",
+        content="From=1234567890&Body=Hello&ProfileName=Test&WaId=1234567890",
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+    assert response.status_code == 204
+    mock_twilio_client.messages.create.assert_called()

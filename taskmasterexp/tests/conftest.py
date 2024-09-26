@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import date
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from taskmasterexp.app import app
 from taskmasterexp.auth.token import Token, create_access_token
+from taskmasterexp.chatbot.history import ChatHistory, get_chat_history_whatsapp
+from taskmasterexp.chatbot.twilio import get_twilio_client
 from taskmasterexp.database.dependencies import inject_db_session
 from taskmasterexp.database.managers import (
     SubscriptionManager,
@@ -40,7 +42,12 @@ async def db_session(sessionmaker):
 
 
 @pytest.fixture
-def test_client(sessionmaker):
+def mock_twilio_client():
+    return Mock()
+
+
+@pytest.fixture
+def test_client(sessionmaker, mock_twilio_client):
     async def override_db_session():
         async with sessionmaker() as session:
             yield session
@@ -48,8 +55,17 @@ def test_client(sessionmaker):
     def override_paypal_client():
         return AsyncMock()
 
+    def override_twilio_client():
+        return mock_twilio_client
+
+    def override_chat_history_whatsapp():
+        return ChatHistory(AsyncMock(), "wa:123")
+
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
+    app.dependency_overrides[get_twilio_client] = override_twilio_client
+    app.dependency_overrides[get_chat_history_whatsapp] = override_chat_history_whatsapp
+
     return TestClient(app)
 
 
