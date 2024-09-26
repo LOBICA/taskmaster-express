@@ -12,6 +12,7 @@ from taskmasterexp.settings import (
 )
 
 from .dependencies import ChatHistoryWA, WhatsAppAgent
+from .errors import MessageTooLongError
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,19 @@ def get_twilio_client():
 async def _send_split_message(text: str, destination: str):
     messages = []
     char_count = 0
-    for paragraph in text.split("\n"):
-        char_count += len(paragraph)
+
+    paragraphs = text.split("\n")
+
+    if any(len(paragraph) > 1300 for paragraph in paragraphs):
+        raise MessageTooLongError
+
+    for paragraph in paragraphs:
+        paragraph_len = len(paragraph)
+        char_count += paragraph_len
         if char_count > 1300:
             _send_message("\n".join(messages), destination=destination)
             messages = []
-            char_count = len(paragraph)
+            char_count = paragraph_len
             # Add a delay between messages
             await asyncio.sleep(1)
         messages.append(paragraph)
@@ -49,6 +57,19 @@ def _send_message(text: str, destination: str):
     )
 
 
+async def _invoke_agent(agent: WhatsAppAgent, history: ChatHistoryWA, text: str):
+    messages = history.get_messages()
+    response = agent.ainvoke(
+        {
+            "history": messages,
+            "text": text,
+        }
+    )
+    await history.add_message("human", text)
+    await history.add_message("ai", response["output"])
+    return response
+
+
 @router.post("/webhook", status_code=status.HTTP_204_NO_CONTENT)
 async def receive_message(
     agent: WhatsAppAgent,
@@ -57,16 +78,18 @@ async def receive_message(
     Body: Annotated[str, Form()],
 ):
     logger.info(f"Received message: {Body}")
-    messages = await history.get_messages()
-    response = await agent.ainvoke(
-        {
-            "history": messages,
-            "text": Body,
-        }
-    )
-    if len(response["output"]) > 1300:
-        _send_split_message(response["output"], destination=From)
-    else:
-        _send_message(response["output"], destination=From)
-    await history.add_message("human", Body)
-    await history.add_message("ai", response["output"])
+    try:
+        response = await _invoke_agent(agent, history, Body)
+        if len(response["output"]) > 1300:
+            try:
+                _send_split_message(response["output"], destination=From)
+            except MessageTooLongError:
+                response = await _invoke_agent(
+                    agent, history, "Please shorten your answer"
+                )
+                _send_split_message(response["output"], destination=From)
+        else:
+            _send_message(response["output"], destination=From)
+    except Exception as e:
+        logger.exception(e)
+        _send_message("Sorry, an error occurred", destination=From)
