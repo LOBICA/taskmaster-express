@@ -68,12 +68,12 @@ async def receive_message(
         response = await _invoke_agent(agent, history, Body)
         if len(response["output"]) > 1300:
             try:
-                _send_split_message(twilio, response["output"], destination=From)
+                await _send_split_message(twilio, response["output"], destination=From)
             except MessageTooLongError:
                 response = await _invoke_agent(
                     agent, history, "Please shorten your answer"
                 )
-                _send_split_message(twilio, response["output"], destination=From)
+                await _send_split_message(twilio, response["output"], destination=From)
         else:
             _send_message(twilio, response["output"], destination=From)
     except Exception as e:
