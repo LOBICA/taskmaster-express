@@ -4,7 +4,6 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import tool
 
-
 from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import DEMO_TOPIC
 
