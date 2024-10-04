@@ -2,6 +2,8 @@ import logging
 
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.tools import tool
+
 
 from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import DEMO_TOPIC
@@ -12,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 human_template = "{text}"
+
+
+@tool
+def demo_tool():
+    """A tool that does nothing, just a placeholder for the demo."""
+    return DEMO_TOPIC
 
 
 async def get_demo_chat_agent(user: User) -> AgentExecutor:
@@ -31,7 +39,7 @@ async def get_demo_chat_agent(user: User) -> AgentExecutor:
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ]
 
-    tools = []
+    tools = [demo_tool]
 
     chat_prompt = ChatPromptTemplate.from_messages(messages)
 
