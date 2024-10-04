@@ -7,7 +7,6 @@ from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import DEMO_TOPIC
 
 from ..client import get_chat_model
-from ..tools import get_current_time
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,7 @@ async def get_demo_chat_agent(user: User) -> AgentExecutor:
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ]
 
-    tools = [get_current_time]
+    tools = []
 
     chat_prompt = ChatPromptTemplate.from_messages(messages)
 
