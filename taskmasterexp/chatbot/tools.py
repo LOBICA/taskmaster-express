@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 def _get_weekday() -> str:
     """Return the current weekday."""
-    return datetime.datetime.now().strftime("%A")
+    zone = ZoneInfo("America/Los_Angeles")
+    return datetime.datetime.now(tz=zone).strftime("%A")
 
 
 @tool
