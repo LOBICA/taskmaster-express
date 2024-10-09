@@ -1,7 +1,9 @@
 import datetime
 from zoneinfo import ZoneInfo
 
-TZ = ZoneInfo("America/Los_Angeles")
+from taskmasterexp.settings import TIMEZONE
+
+TZ = ZoneInfo(TIMEZONE)
 
 
 def get_weekday() -> str:
