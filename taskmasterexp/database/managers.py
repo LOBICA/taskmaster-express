@@ -34,12 +34,12 @@ class UserManager(BaseManager):
     async def list(self) -> list[User]:
         stmt = select(UserModel)
         result: Result = await self.session.execute(stmt)
-        return [User.from_orm(model) for model in result.scalars()]
+        return [User.model_validate(model) for model in result.scalars()]
 
     async def get(self, user_id: UUID) -> User | None:
         model = await self.session.get(UserModel, user_id)
         if model:
-            return User.from_orm(model)
+            return User.model_validate(model)
 
         return None
 
@@ -48,17 +48,17 @@ class UserManager(BaseManager):
         result: Result = await self.session.execute(stmt)
         model = result.scalar_one_or_none()
         if model:
-            return User.from_orm(model)
+            return User.model_validate(model)
 
         return None
 
     async def save(self, user: User, password: str = None) -> User:
         if user.uuid:
             model = await self.session.get(UserModel, user.uuid)
-            for field, value in user.dict().items():
+            for field, value in user.model_dump().items():
                 setattr(model, field, value)
         else:
-            model = UserModel(**user.dict(exclude={"uuid"}))
+            model = UserModel(**user.model_dump(exclude={"uuid"}))
             self.session.add(model)
 
         if password:
@@ -66,7 +66,7 @@ class UserManager(BaseManager):
 
         await self.session.commit()
         await self.session.refresh(model)
-        return User.from_orm(model)
+        return User.model_validate(model)
 
     async def change_password(
         self, user_id: UUID, password: str, new_password: str
@@ -150,27 +150,27 @@ class TaskManager(BaseManager):
                     return []
 
         result: Result = await self.session.execute(stmt)
-        return [Task.from_orm(model) for model in result.scalars()]
+        return [Task.model_validate(model) for model in result.scalars()]
 
     async def get(self, task_id: UUID) -> Task | None:
         model = await self.session.get(TaskModel, task_id)
         if model:
-            return Task.from_orm(model)
+            return Task.model_validate(model)
 
         return None
 
     async def save(self, task: Task) -> Task:
         if task.uuid:
             model = await self.session.get(TaskModel, task.uuid)
-            for field, value in task.dict(exclude={"uuid"}).items():
+            for field, value in task.model_dump(exclude={"uuid"}).items():
                 setattr(model, field, value)
         else:
-            model = TaskModel(**task.dict(exclude={"uuid"}))
+            model = TaskModel(**task.model_dump(exclude={"uuid"}))
             self.session.add(model)
 
         await self.session.commit()
         await self.session.refresh(model)
-        return Task.from_orm(model)
+        return Task.model_validate(model)
 
     async def delete(self, task_id: UUID) -> None:
         model = await self.session.get(TaskModel, task_id)
@@ -189,7 +189,7 @@ class SubscriptionManager(BaseManager):
         results = await self.session.execute(stmt)
         model = results.scalar_one_or_none()
         if model:
-            return Subscription.from_orm(model)
+            return Subscription.model_validate(model)
 
         return None
 
@@ -210,7 +210,7 @@ class SubscriptionManager(BaseManager):
             self.session.add(subscription)
         await self.session.commit()
         await self.session.refresh(subscription)
-        return Subscription.from_orm(subscription)
+        return Subscription.model_validate(subscription)
 
     async def activate_subscription(
         self, subscription_id: str, plan_id: str
@@ -231,7 +231,7 @@ class SubscriptionManager(BaseManager):
 
         await self.session.commit()
         await self.session.refresh(subscription)
-        return Subscription.from_orm(subscription)
+        return Subscription.model_validate(subscription)
 
     async def cancel_subscription(self, subscription_id: str) -> None:
         stmt = select(SubscriptionModel).where(
@@ -252,6 +252,6 @@ class SubscriptionManager(BaseManager):
         results = await self.session.execute(stmt)
         model = results.scalar_one_or_none()
         if model:
-            return Subscription.from_orm(model)
+            return Subscription.model_validate(model)
 
         return None
