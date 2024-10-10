@@ -7,7 +7,7 @@ class SubscriptionData(BaseModel):
     is_active: bool = Field(..., alias="isActive")
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 class SubscriptionResponse(SubscriptionData):
@@ -21,8 +21,8 @@ class Subscription(SubscriptionData):
     plan_id: str | None
 
     class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
+        from_attributes = True
+        populate_by_name = True
 
 
 class SubscriptionPayload(BaseModel):

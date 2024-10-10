@@ -70,4 +70,4 @@ class WebhookResource(BaseModel):
     status: str
 
 
-WebhookData.update_forward_refs()
+WebhookData.model_rebuild()
