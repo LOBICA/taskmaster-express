@@ -20,7 +20,7 @@ async def get_subscription_status(
         current_user.uuid
     )
     if subscription:
-        return SubscriptionResponse(**subscription.dict())
+        return SubscriptionResponse(**subscription.model_dump())
     return SubscriptionResponse(is_active=False)
 
 
@@ -33,7 +33,7 @@ async def link_subscription_to_user(
     subscription = await subscriptions_manager.link_subscription(
         current_user.uuid, payload.subscription_id
     )
-    return SubscriptionResponse(**subscription.dict())
+    return SubscriptionResponse(**subscription.model_dump())
 
 
 @router.post("/cancel", status_code=status.HTTP_204_NO_CONTENT)

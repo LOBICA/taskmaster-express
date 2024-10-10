@@ -13,7 +13,9 @@ async def test_paypal_webhook(test_admin_client):
         },
     )
 
-    response = test_admin_client.post("/paypal/webhooks/subscription", json=data.dict())
+    response = test_admin_client.post(
+        "/paypal/webhooks/subscription", json=data.model_dump()
+    )
     assert response.status_code == 200
 
 
@@ -26,7 +28,9 @@ async def test_activate_subscription(
         resource={"id": "I-1234567890", "plan_id": "P-1234567890", "status": "ACTIVE"},
     )
 
-    response = test_admin_client.post("/paypal/webhooks/subscription", json=data.dict())
+    response = test_admin_client.post(
+        "/paypal/webhooks/subscription", json=data.model_dump()
+    )
     assert response.status_code == 200
 
     subscription = await subscription_manager.get_subscription_by_subscription_id(
@@ -54,7 +58,9 @@ async def test_cancel_subscription(
         },
     )
 
-    response = test_admin_client.post("/paypal/webhooks/subscription", json=data.dict())
+    response = test_admin_client.post(
+        "/paypal/webhooks/subscription", json=data.model_dump()
+    )
     assert response.status_code == 200
 
     subscription = await subscription_manager.get_subscription_by_subscription_id(
