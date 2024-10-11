@@ -43,7 +43,7 @@ class Task(TaskData):
         self.mood = data.get("mood", self.mood)
 
     def to_json(self):
-        return json.dumps(self.dict(), cls=CustomEncoder)
+        return json.dumps(self.model_dump(), cls=CustomEncoder)
 
     @staticmethod
     def ai_format_template():
@@ -71,7 +71,7 @@ class Task(TaskData):
         )
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TaskResponse(TaskData):

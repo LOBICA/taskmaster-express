@@ -86,7 +86,7 @@ async def test_admin_user(db_session, admin_user_password):
     db_session.add(user)
     await db_session.commit()
 
-    return User.from_orm(user)
+    return User.model_validate(user)
 
 
 @pytest.fixture
