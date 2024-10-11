@@ -34,7 +34,7 @@ async def list_tasks(
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=TaskResponse)
 async def add_tasks(current_user: CurrentUser, manager: TaskManager, data: TaskData):
-    task = Task(user_id=current_user.uuid, **data.dict())
+    task = Task(user_id=current_user.uuid, **data.model_dump())
     task = await manager.save(task)
     return task
 
@@ -63,7 +63,7 @@ async def modify_task(
     if task.user_id != current_user.uuid:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    task.update(data.dict(exclude_unset=True))
+    task.update(data.model_dump(exclude_unset=True))
     await manager.save(task)
 
     return task

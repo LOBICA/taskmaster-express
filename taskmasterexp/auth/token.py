@@ -52,7 +52,7 @@ class TokenResponse(BaseModel):
 def create_access_token(
     data: Token, fresh=True, expires_delta: timedelta | None = None
 ):
-    to_encode = data.dict(exclude={"scopes"})
+    to_encode = data.model_dump(exclude={"scopes"})
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -66,7 +66,7 @@ def create_access_token(
 
 
 def create_refresh_token(data: Token, expires_delta: timedelta | None = None):
-    to_encode = data.dict(exclude={"scopes"})
+    to_encode = data.model_dump(exclude={"scopes"})
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
