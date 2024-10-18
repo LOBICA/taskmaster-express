@@ -1,13 +1,20 @@
 import logging
+from typing import Literal
 
-from langchain.agents import AgentExecutor, create_openai_tools_agent
-from langchain.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
+from langchain.agents import AgentExecutor
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode
 
 from taskmasterexp.auth.dependencies import CurrentUserWA, CurrentUserWS
+from taskmasterexp.database.dependencies import Redis
+from taskmasterexp.helpers import get_current_time, get_weekday
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import DEMO_PHONE_NUMBERS
 
+from .checkpoint.redis import AsyncRedisSaver
 from .client import get_chat_model
 from .demo import get_demo_chat_agent
 from .tools import tools
@@ -15,12 +22,7 @@ from .tools import tools
 logger = logging.getLogger(__name__)
 
 
-human_template = "{text}"
-
-
-async def _get_chat_agent(user: User) -> AgentExecutor:
-    logger.info(f"Getting chat prompt for user {user.uuid}")
-
+async def _get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
     task_template = "[title]\n[description]\nStatus: [status]\n"
 
     if not user.email:
@@ -35,63 +37,66 @@ async def _get_chat_agent(user: User) -> AgentExecutor:
             "we won't be able to associate a new one"
         )
 
-    messages = [
-        ("system", "You are a helpful assistant"),
-        ("system", "You are helping the user to organize their tasks"),
-        ("system", "The url for the aplication is https://helpitdone.com"),
-        ("system", f"The user's uuid is {user.uuid}"),
-        ("human", f"My name is {user.name}"),
-        ("system", f"The task format is: <{Task.ai_format_template()}>"),
-        ("system", "You will list the tasks as: \n1.[title]\n2.[title]\n..."),
-        ("system", "If the task list is empty you will say that there are no tasks"),
-        (
-            "system",
+    system_messages = [
+        SystemMessage("You are an assistant helping the user to organize their tasks"),
+        SystemMessage("The url for the aplication is https://helpitdone.com"),
+        SystemMessage(f"The user's uuid is {user.uuid}"),
+        HumanMessage(f"My name is {user.name}"),
+        SystemMessage(f"The task format is: <{Task.ai_format_template()}>"),
+        SystemMessage("You will list the tasks as: \n1.[title]\n2.[title]\n..."),
+        SystemMessage("If the task list is empty you will say that there are no tasks"),
+        SystemMessage(
             "When giving more details about a tasks "
-            f"you will present them as {task_template}.",
+            f"you will present them as {task_template}."
         ),
-        ("system", "Greet back the user, only provide task information if asked"),
-        ("system", "Don't guess the date, use the 'get_current_time' tool instead"),
-        (
-            "system",
-            "When using a tool always use the task's uuid provided by 'get_task_list' "
-            "as the 'task_id'. Don't guess the task's uuid.",
-        ),
-        (
-            "system",
-            "Always get the task's updated information before providing information "
-            "or interacting with the task, use the 'get_task_list' tool to get "
-            "the list of tasks, or the 'get_task' tool to get a specific task.",
-        ),
-        (
-            "system",
-            "Only mark a task as done if the user has already done it, "
-            "if the user says that it *will* or *should* do it, set a due date instead."
-            "If you are not sure, ask for confirmation.",
-        ),
-        ("system", email_message),
-        MessagesPlaceholder(variable_name="history"),
-        ("human", human_template),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
+        SystemMessage(f"Today is {get_weekday()}, {get_current_time()}"),
+        SystemMessage(email_message),
     ]
-    logger.info(messages)
 
-    chat_prompt = ChatPromptTemplate.from_messages(messages)
+    def should_continue(state: MessagesState) -> Literal["tools", END]:
+        messages = state["messages"]
+        last_message = messages[-1]
+        # If the LLM makes a tool call, then we route to the "tools" node
+        if last_message.tool_calls:
+            logger.info("Calling tools")
+            return "tools"
+        # Otherwise, we stop (reply to the user)
+        return END
 
-    agent = create_openai_tools_agent(get_chat_model(), tools, chat_prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    async def call_model(state: MessagesState, config: RunnableConfig):
+        model = get_chat_model().bind_tools(tools)
+        messages = state["messages"]
+        response = await model.ainvoke(
+            system_messages + messages,
+            config,
+        )
+        return {"messages": [response]}
 
-    return agent_executor
+    workflow = StateGraph(MessagesState)
+
+    workflow.add_node("agent", call_model)
+    workflow.add_node("tools", ToolNode(tools))
+
+    workflow.add_edge(START, "agent")
+    workflow.add_conditional_edges("agent", should_continue)
+    workflow.add_edge("tools", "agent")
+
+    app = workflow.compile(checkpointer=checkpointer)
+
+    return app
 
 
 async def get_chat_agent(
     user: CurrentUserWS,
+    redis: Redis,
 ) -> AgentExecutor:
-    return await _get_chat_agent(user)
+    return await _get_chat_agent(user, AsyncRedisSaver(redis))
 
 
 async def get_whatsapp_chat_agent(
     user: CurrentUserWA,
+    redis: Redis,
 ) -> AgentExecutor:
     if user.phone_number in DEMO_PHONE_NUMBERS:
         return await get_demo_chat_agent(user)
-    return await _get_chat_agent(user)
+    return await _get_chat_agent(user, AsyncRedisSaver(redis))

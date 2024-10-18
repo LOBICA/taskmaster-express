@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_chat_model():
-    logger.info(f"Setting up chat model {OPENAI_MODEL}")
     return ChatOpenAI(
         api_key=OPENAI_API_KEY,
         model=OPENAI_MODEL,

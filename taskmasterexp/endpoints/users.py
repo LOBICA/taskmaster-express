@@ -24,7 +24,7 @@ async def delete_current_user(manager: UserManager, current_user: CurrentUser):
 
 @router.post("", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register_user(manager: UserManager, user: UserRegisterInput):
-    new_user = User(**user.dict(exclude={"password"}))
+    new_user = User(**user.model_dump(exclude={"password"}))
     user = await manager.save(new_user, user.password)
     return user
 

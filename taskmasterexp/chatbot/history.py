@@ -33,7 +33,7 @@ class ChatHistory:
     async def add_message(self, message_class: str, message: str):
         message_ = Message(message_class=message_class, message=message)
         history = await self._get_history()
-        history.append(message_.dict())
+        history.append(message_.model_dump())
         await self._save_history(history)
 
     async def get_messages(self) -> list[tuple[str, str]]:

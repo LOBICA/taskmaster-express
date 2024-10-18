@@ -41,7 +41,7 @@ async def _get_current_user(session: DBSession, encoded_token: str) -> User:
     if user.disabled:
         raise credentials_exception
 
-    return User.from_orm(user)
+    return User.model_validate(user)
 
 
 async def get_current_user(
