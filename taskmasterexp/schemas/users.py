@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class UserData(BaseModel):
     name: str
-    email: str | None
+    email: str | None = None
     phone_number: str | None = None
 
 

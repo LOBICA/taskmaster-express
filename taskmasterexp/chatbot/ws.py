@@ -4,7 +4,10 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, WebSocket
+from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field, ValidationError
+
+from taskmasterexp.auth.dependencies import CurrentUserWS
 
 from .dependencies import ChatAgent
 
@@ -33,25 +36,35 @@ class ChatInput(BaseModel):
 async def chat_endpoint(
     websocket: WebSocket,
     agent: ChatAgent,
+    user: CurrentUserWS,
 ):
     await websocket.accept()
 
-    response = await agent.ainvoke(
+    async for step in agent.astream(
         {
-            "history": [],
-            "text": "Hello",
-        }
-    )
+            "messages": [HumanMessage("Hello")],
+        },
+        config={
+            "configurable": {"thread_id": str(user.uuid)},
+        },
+        stream_mode="updates",
+    ):
+        logger.info(f"Step: {step}")
+        final_result = step
 
-    response_message = Message(
-        text=response["output"],
-        sender="Helper",
-    )
-    await websocket.send_text(response_message.json())
+    logger.info("Finish graph")
+    try:
+        response_message = Message(
+            text=final_result["agent"]["messages"][-1].content,
+            sender="Helper",
+        )
+        await websocket.send_text(response_message.model_dump_json())
+    except Exception as e:
+        logger.exception(e)
+        await websocket.send_text("There was an error")
 
     while True:
         data = await websocket.receive_text()
-        logger.info(f"Received data: {data}")
 
         if data == "close":
             await websocket.close()
@@ -68,18 +81,30 @@ async def chat_endpoint(
             logger.error(f"Invalid message: {data}")
             continue
 
-        response = await agent.ainvoke(
+        logger.info(f"Received message: {chat_input.message.text}")
+        async for step in agent.astream(
             {
-                "history": [
-                    (message.message_class, message.text)
-                    for message in chat_input.history
-                ],
-                "text": chat_input.message.text,
+                "messages": [HumanMessage(chat_input.message.text)],
             },
-        )
+            config={
+                "configurable": {"thread_id": str(user.uuid)},
+            },
+            stream_mode="updates",
+        ):
+            logger.info(f"Step: {step}")
+            final_result = step
 
-        response_message = Message(
-            text=response["output"],
-            sender="Helper",
-        )
-        await websocket.send_text(response_message.json())
+        logger.info("Finish graph")
+        try:
+            response_message = Message(
+                text=final_result["agent"]["messages"][-1].content,
+                sender="Helper",
+            )
+            await websocket.send_text(response_message.model_dump_json())
+        except Exception as e:
+            logger.exception(e)
+            response_message = Message(
+                text="There was an error",
+                sender="Helper",
+            )
+            await websocket.send_text(response_message.model_dump_json())
