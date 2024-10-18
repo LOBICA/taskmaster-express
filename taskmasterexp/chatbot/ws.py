@@ -103,4 +103,8 @@ async def chat_endpoint(
             await websocket.send_text(response_message.model_dump_json())
         except Exception as e:
             logger.exception(e)
-            await websocket.send_text("There was an error")
+            response_message = Message(
+                text="There was an error",
+                sender="Helper",
+            )
+            await websocket.send_text(response_message.model_dump_json())
