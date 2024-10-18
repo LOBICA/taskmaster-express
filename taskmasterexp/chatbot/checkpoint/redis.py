@@ -1,4 +1,8 @@
-"""Implementation of a langgraph checkpoint saver using Redis."""
+"""Implementation of a langgraph checkpoint saver using Redis.
+
+Based on the example in
+https://langchain-ai.github.io/langgraph/how-tos/persistence_redis/
+"""
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, AsyncIterator, List, Optional, Tuple
 
@@ -20,7 +24,7 @@ REDIS_KEY_SEPARATOR = ":"
 EXPIRATION_TIME = 60 * 60  # 1 hour
 
 
-# Utilities shared by both RedisSaver and AsyncRedisSaver
+# Utilities used by AsyncRedisSaver
 
 
 def _make_redis_checkpoint_key(

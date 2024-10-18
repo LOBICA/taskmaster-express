@@ -40,7 +40,7 @@ async def chat_endpoint(
 ):
     await websocket.accept()
 
-    async for chunk in agent.astream(
+    async for step in agent.astream(
         {
             "messages": [HumanMessage("Hello")],
         },
@@ -49,8 +49,8 @@ async def chat_endpoint(
         },
         stream_mode="updates",
     ):
-        logger.info(f"Chunk: {chunk}")
-        final_result = chunk
+        logger.info(f"Step: {step}")
+        final_result = step
 
     logger.info("Finish graph")
     try:
@@ -82,7 +82,7 @@ async def chat_endpoint(
             continue
 
         logger.info(f"Received message: {chat_input.message.text}")
-        async for chunk in agent.astream(
+        async for step in agent.astream(
             {
                 "messages": [HumanMessage(chat_input.message.text)],
             },
@@ -91,8 +91,8 @@ async def chat_endpoint(
             },
             stream_mode="updates",
         ):
-            logger.info(f"Chunk: {chunk}")
-            final_result = chunk
+            logger.info(f"Step: {step}")
+            final_result = step
 
         logger.info("Finish graph")
         try:
