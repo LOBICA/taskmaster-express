@@ -162,7 +162,7 @@ class PayPalClient:
 
         headers = self._get_headers()
         url = f"{PAYPAL_API_URL}/v1/billing/plans"
-        response = httpx.post(url, headers=headers, json=subscription_plan.dict())
+        response = httpx.post(url, headers=headers, json=subscription_plan.model_dump())
         response.raise_for_status()
         data = response.json()
         return data["id"]

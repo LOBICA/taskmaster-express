@@ -3,10 +3,12 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Form, status
+from langchain_core.messages import HumanMessage
 
+from taskmasterexp.auth.dependencies import CurrentUserWA
 from taskmasterexp.settings import WHATSAPP_NUMBER
 
-from .dependencies import ChatHistoryWA, TwilioClient, WhatsAppAgent
+from .dependencies import TwilioClient, WhatsAppAgent
 from .errors import MessageTooLongError
 
 logger = logging.getLogger(__name__)
@@ -42,40 +44,43 @@ def _send_message(client: TwilioClient, text: str, destination: str):
     )
 
 
-async def _invoke_agent(agent: WhatsAppAgent, history: ChatHistoryWA, text: str):
-    messages = await history.get_messages()
-    response = await agent.ainvoke(
+async def _invoke_agent(agent: WhatsAppAgent, user_uuid: str, text: str):
+    async for step in agent.astream(
         {
-            "history": messages,
-            "text": text,
-        }
-    )
-    await history.add_message("human", text)
-    await history.add_message("ai", response["output"])
-    return response
+            "messages": [HumanMessage(text)],
+        },
+        config={
+            "configurable": {"thread_id": "wa-" + str(user_uuid)},
+        },
+        stream_mode="updates",
+    ):
+        logger.info(f"Step: {step}")
+        final_result = step
+
+    return final_result["agent"]["messages"][-1].content
 
 
 @router.post("/webhook", status_code=status.HTTP_204_NO_CONTENT)
 async def receive_message(
     agent: WhatsAppAgent,
-    history: ChatHistoryWA,
+    user: CurrentUserWA,
     twilio: TwilioClient,
     From: Annotated[str, Form()],
     Body: Annotated[str, Form()],
 ):
     logger.info(f"Received message: {Body}")
     try:
-        response = await _invoke_agent(agent, history, Body)
-        if len(response["output"]) > 1300:
+        response = await _invoke_agent(agent, str(user.uuid), Body)
+        if len(response) > 1300:
             try:
-                await _send_split_message(twilio, response["output"], destination=From)
+                await _send_split_message(twilio, response, destination=From)
             except MessageTooLongError:
                 response = await _invoke_agent(
-                    agent, history, "Please shorten your answer"
+                    agent, str(user.uuid), "Please shorten your answer"
                 )
-                await _send_split_message(twilio, response["output"], destination=From)
+                await _send_split_message(twilio, response, destination=From)
         else:
-            _send_message(twilio, response["output"], destination=From)
+            _send_message(twilio, response, destination=From)
     except Exception as e:
         logger.exception(e)
         _send_message(twilio, "Sorry, an error occurred", destination=From)
