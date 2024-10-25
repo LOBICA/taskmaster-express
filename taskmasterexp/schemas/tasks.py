@@ -29,11 +29,7 @@ class TaskData(BaseModel):
     status: TaskStatus = TaskStatus.PENDING
     due_date: date | None = None
     mood: TaskMood = TaskMood.NEUTRAL
-
-
-class Task(TaskData):
-    uuid: UUID | None = None
-    user_id: UUID
+    is_main_priority: bool = False
 
     def update(self, data: dict):
         self.title = data.get("title", self.title)
@@ -41,6 +37,12 @@ class Task(TaskData):
         self.status = data.get("status", self.status)
         self.due_date = data.get("due_date", self.due_date)
         self.mood = data.get("mood", self.mood)
+        self.is_main_priority = data.get("is_main_priority", self.is_main_priority)
+
+
+class Task(TaskData):
+    uuid: UUID | None = None
+    user_id: UUID
 
     def to_json(self):
         return json.dumps(self.model_dump(), cls=CustomEncoder)
@@ -55,6 +57,7 @@ class Task(TaskData):
                 "[status]",
                 "[due_date]",
                 "[mood]",
+                "[is_main_priority]",
             ]
         )
 
@@ -67,6 +70,7 @@ class Task(TaskData):
                 str(self.status.value),
                 str(self.due_date),
                 str(self.mood.value),
+                str(self.is_main_priority),
             ]
         )
 
