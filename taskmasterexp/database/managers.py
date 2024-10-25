@@ -172,6 +172,22 @@ class TaskManager(BaseManager):
         await self.session.refresh(model)
         return Task.model_validate(model)
 
+    async def set_main_priority_for_date(self, task: Task, date: date) -> None:
+        stmt = select(TaskModel).where(
+            TaskModel.user_id == task.user_id,
+            TaskModel.due_date == date,
+            TaskModel.is_main_priority == True,
+        )
+        result = await self.session.execute(stmt)
+        for existing_main_priority in result.scalars():
+            existing_main_priority.is_main_priority = False
+        await self.session.commit()
+
+        model = await self.session.get(TaskModel, task.uuid)
+        if model:
+            model.is_main_priority = True
+            await self.session.commit()
+
     async def delete(self, task_id: UUID) -> None:
         model = await self.session.get(TaskModel, task_id)
         if model:
