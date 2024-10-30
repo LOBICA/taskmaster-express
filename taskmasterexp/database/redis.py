@@ -1,8 +1,11 @@
+from contextlib import asynccontextmanager
+
 import redis.asyncio as redis
 
 from taskmasterexp.settings import REDIS_URL
 
 
+@asynccontextmanager
 async def get_redis():
     if "rediss" in REDIS_URL:
         # Configuration for Heroku
@@ -13,3 +16,8 @@ async def get_redis():
         await conn.ping()
         yield client
     await client.aclose()
+
+
+async def cleanup_redis():
+    async with get_redis() as conn:
+        await conn.flushall()

@@ -11,6 +11,7 @@ def cli():
 
 
 cli.add_command(database_cli.seed)
+cli.add_command(database_cli.cleanup_redis)
 
 cli.add_command(paypal_cli.list_paypal_products)
 cli.add_command(paypal_cli.add_paypal_product)
