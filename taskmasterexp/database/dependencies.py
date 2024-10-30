@@ -40,4 +40,9 @@ SubscriptionManager = Annotated[
 ]
 
 
-Redis = Annotated[redis.Redis, Depends(get_redis)]
+async def inject_redis():
+    async with get_redis() as conn:
+        yield conn
+
+
+Redis = Annotated[redis.Redis, Depends(inject_redis)]
