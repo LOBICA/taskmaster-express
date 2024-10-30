@@ -1,12 +1,10 @@
 import asyncio
 
-import click
-
 from .connection import get_engine, get_session
 from .models import UserModel
 
 
-async def _seed():
+async def seed():
     user = UserModel(email="admin@example.com", name="Admin")
     user.set_password("password")
 
@@ -16,14 +14,7 @@ async def _seed():
             await session.commit()
 
 
-@click.command()
-def seed():
-    click.echo("Seeding database...")
-    asyncio.run(_seed())
-    click.echo("Done!")
-
-
 if __name__ == "__main__":
     print("Seeding database...")
-    asyncio.run(_seed())
+    asyncio.run(seed())
     print("Done!")
