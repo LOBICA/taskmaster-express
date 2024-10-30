@@ -185,6 +185,7 @@ class TaskManager(BaseManager):
 
         model = await self.session.get(TaskModel, task.uuid)
         if model:
+            model.due_date = date
             model.is_main_priority = True
             await self.session.commit()
 
