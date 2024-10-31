@@ -68,7 +68,11 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
 
 @tool
 async def add_new_task(
-    user_id: str, title: str, description: str, due_date: str = None, is_main_priority: bool = False
+    user_id: str,
+    title: str,
+    description: str,
+    due_date: str = None,
+    is_main_priority: bool = False,
 ) -> str | None:
     """Add a new task for the user.
 
@@ -172,9 +176,13 @@ async def set_task_as_main_priority_for_date(task_id: str, date: str) -> str | N
     async with TaskManager.start_session() as manager:
         try:
             task = await manager.get(UUID(task_id))
-            await manager.set_main_priority_for_date(task, datetime.datetime.fromisoformat(date).date())
+            await manager.set_main_priority_for_date(
+                task, datetime.datetime.fromisoformat(date).date()
+            )
         except Exception:
-            logger.exception(f"Error setting main priority for task {task_id} on date {date}")
+            logger.exception(
+                f"Error setting main priority for task {task_id} on date {date}"
+            )
             return None
 
     return task.ai_format()
