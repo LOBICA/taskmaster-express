@@ -45,7 +45,8 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
     Provided the user's uuid and the date, return the list of tasks for that user
     on that date, or None if there was an error.
 
-    Always tell back the user the date that you used to get the tasks.
+    Always tell back the user the date that you used to get the tasks. If there
+    is a task that is the main priority list it at the beginning and let the user now.
     """
     logger.info(f"Getting tasks for user {user_id} on date {date}")
     async with TaskManager.start_session() as manager:
@@ -67,13 +68,18 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
 
 @tool
 async def add_new_task(
-    user_id: str, title: str, description: str, due_date: str = None
+    user_id: str,
+    title: str,
+    description: str,
+    due_date: str = None,
+    is_main_priority: bool = False,
 ) -> str | None:
     """Add a new task for the user.
 
     Provided the user's uuid, the task title, and the task description.
-    It the user specifies a due date, it will be used, otherwise the task will
-    have no due date.
+
+    Add a due_date if the user has provided it. Also, mark the task as
+    the main priority if the user has requested it.
 
     Returns the newly created task details, or None if there was an error.
     """
@@ -90,6 +96,9 @@ async def add_new_task(
                 due_date=due_date,
             )
             task = await manager.save(task)
+
+            if task.due_date and is_main_priority:
+                await manager.set_main_priority_for_date(task, task.due_date)
         except Exception:
             logger.exception(f"Error adding new task for user {user_id}")
             return None
@@ -137,6 +146,43 @@ async def set_task_due_date(task_id: str, due_date: str) -> str | None:
             task = await manager.save(task)
         except Exception:
             logger.exception(f"Error setting due date for task {task_id}")
+            return None
+
+    return task.ai_format()
+
+
+@tool
+def set_main_priority(main_priority: str, date: str):
+    """Set the main priority for the date."""
+    instructions = (
+        f"Check if the user has a pending task for {main_priority}. "
+        f"If it does, set that task as the main priority for {date}."
+        f"If it doesn't, create a new task with title [{main_priority}] with "
+        f"the [due date] '{date}', [is_main_priority] as true, "
+        f"and an appropiate [description]."
+    )
+    return instructions
+
+
+@tool
+async def set_task_as_main_priority_for_date(task_id: str, date: str) -> str | None:
+    """Set a task as the main priority for a specific date.
+
+    Provided the task's uuid and the date in isoformat.
+
+    Returns the updated task details, or None if there was an error.
+    """
+    logger.info(f"Setting main priority for task {task_id} on date {date}")
+    async with TaskManager.start_session() as manager:
+        try:
+            task = await manager.get(UUID(task_id))
+            await manager.set_main_priority_for_date(
+                task, datetime.datetime.fromisoformat(date).date()
+            )
+        except Exception:
+            logger.exception(
+                f"Error setting main priority for task {task_id} on date {date}"
+            )
             return None
 
     return task.ai_format()
@@ -203,11 +249,13 @@ async def associate_email_to_user(user_id: str, email: str):
 
 
 tools = [
+    set_main_priority,
     get_pending_task_list,
     get_tasks_for_date,
     add_new_task,
     modify_task,
     set_task_due_date,
+    set_task_as_main_priority_for_date,
     complete_task,
     delete_task,
     associate_email_to_user,

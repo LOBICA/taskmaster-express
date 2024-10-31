@@ -81,3 +81,4 @@ class TaskModel(BaseModel):
     status: Mapped[TaskStatus]
     due_date: Mapped[Optional[date]]
     mood: Mapped[TaskMood]
+    is_main_priority: Mapped[bool] = mapped_column(default=False)
