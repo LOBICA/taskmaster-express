@@ -45,7 +45,8 @@ async def get_tasks_for_date(user_id: str, date: str) -> str | None:
     Provided the user's uuid and the date, return the list of tasks for that user
     on that date, or None if there was an error.
 
-    Always tell back the user the date that you used to get the tasks.
+    Always tell back the user the date that you used to get the tasks. If there
+    is a task that is the main priority list it at the beginning and let the user now.
     """
     logger.info(f"Getting tasks for user {user_id} on date {date}")
     async with TaskManager.start_session() as manager:
