@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
 from . import __version__
+from .ai import demo, messages, ws
 from .auth.endpoints import router as auth_endpoints
-from .chatbot import demo, messages, ws
 from .endpoints import subscriptions, tasks, users
 from .paypal import webhooks
 from .settings import CORS_ORIGINS, FASTAPI_DOCUMENTATION

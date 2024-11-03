@@ -6,11 +6,11 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from taskmaster.ai.assistant import get_whatsapp_chat_agent
+from taskmaster.ai.history import ChatHistory, get_chat_history_whatsapp
+from taskmaster.ai.twilio import get_twilio_client
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
-from taskmaster.chatbot.assistant import get_whatsapp_chat_agent
-from taskmaster.chatbot.history import ChatHistory, get_chat_history_whatsapp
-from taskmaster.chatbot.twilio import get_twilio_client
 from taskmaster.database.dependencies import inject_db_session
 from taskmaster.database.managers import SubscriptionManager, TaskManager, UserManager
 from taskmaster.database.models import BaseModel, UserModel
@@ -123,7 +123,7 @@ def task_manager_generator(db_session):
 @pytest.fixture
 def patch_task_manager(task_manager_generator):
     return patch(
-        "taskmaster.chatbot.tools.TaskManager.start_session", task_manager_generator
+        "taskmaster.ai.tools.TaskManager.start_session", task_manager_generator
     )
 
 

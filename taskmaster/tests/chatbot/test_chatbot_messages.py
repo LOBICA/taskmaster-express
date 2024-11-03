@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 from pytest import raises
 
-from taskmaster.chatbot.errors import MessageTooLongError
-from taskmaster.chatbot.messages import _send_split_message
+from taskmaster.ai.errors import MessageTooLongError
+from taskmaster.ai.messages import _send_split_message
 
 TEXT = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer cursus augue quis lorem pretium, non dictum lacus ultricies. Morbi aliquam felis a venenatis imperdiet. Nullam id dapibus eros. Suspendisse eget ipsum iaculis, fringilla tortor et, malesuada arcu. Ut auctor, mauris non blandit fringilla, massa ante mollis metus, ut efficitur nunc elit vel enim. Sed vel fringilla risus, sed finibus quam. Mauris non magna in dui rhoncus consequat id vestibulum augue. In posuere finibus diam nec consectetur. Proin venenatis dictum hendrerit. Fusce accumsan rutrum leo, et venenatis lectus interdum ac. Duis tincidunt imperdiet tellus, id pellentesque ipsum aliquam sit amet. Quisque condimentum augue nec nulla fermentum gravida nec et odio. Pellentesque malesuada neque libero, non vehicula nulla pellentesque at. Aenean ultrices ante a ligula laoreet lacinia. Aenean in tempor massa. Duis gravida nisi vel felis consequat pretium.
 
@@ -13,7 +13,7 @@ In finibus tellus mi, nec feugiat lacus posuere ut. Curabitur ornare dui erat, v
 """
 
 
-@patch("taskmaster.chatbot.messages._send_message")
+@patch("taskmaster.ai.messages._send_message")
 async def test_send_split_message(mock_send_message):
     result_text = []
 
@@ -34,7 +34,7 @@ async def test_send_split_message(mock_send_message):
     assert mock_send_message.call_count == 2
 
 
-@patch("taskmaster.chatbot.messages._send_message")
+@patch("taskmaster.ai.messages._send_message")
 async def test_send_split_message_long_paragraph(mock_send_message):
     text = "a" * 1400
     assert len(text) > 1300
