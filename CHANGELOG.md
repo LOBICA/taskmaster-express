@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## CURRENT
+* Rename chatbot module to ai
+
 ## v0.5.1
 * Add plugin for poetry export for future compatibility
 * Increase TTL for chat history
