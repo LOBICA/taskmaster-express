@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from taskmasterexp.chatbot.tools import (
+from taskmasterexp.ai.tools import (
     add_new_task,
     complete_task,
     delete_task,
