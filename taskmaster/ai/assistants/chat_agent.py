@@ -7,22 +7,18 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
-from taskmaster.auth.dependencies import CurrentUserWA, CurrentUserWS
-from taskmaster.database.dependencies import Redis
 from taskmaster.helpers import get_current_time, get_weekday
 from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
-from taskmaster.settings import DEMO_PHONE_NUMBERS
 
-from .checkpoint.redis import AsyncRedisSaver
-from .client import get_chat_model
-from .demo import get_demo_chat_agent
-from .tools import tools
+from ..checkpoint.redis import AsyncRedisSaver
+from ..client import get_chat_model
+from ..tools import tools
 
 logger = logging.getLogger(__name__)
 
 
-async def _get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
+async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
     task_template = "[title]\n[description]\nStatus: [status]\n"
 
     if not user.email:
@@ -84,19 +80,3 @@ async def _get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExe
     app = workflow.compile(checkpointer=checkpointer)
 
     return app
-
-
-async def get_chat_agent(
-    user: CurrentUserWS,
-    redis: Redis,
-) -> AgentExecutor:
-    return await _get_chat_agent(user, AsyncRedisSaver(redis))
-
-
-async def get_whatsapp_chat_agent(
-    user: CurrentUserWA,
-    redis: Redis,
-) -> AgentExecutor:
-    if user.phone_number in DEMO_PHONE_NUMBERS:
-        return await get_demo_chat_agent(user)
-    return await _get_chat_agent(user, AsyncRedisSaver(redis))

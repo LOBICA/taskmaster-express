@@ -1,12 +1,34 @@
 from typing import Annotated
 
 from fastapi import Depends
+from langchain.agents import AgentExecutor
 
-from . import assistant, twilio
+from taskmaster.auth.dependencies import CurrentUserWA, CurrentUserWS
+from taskmaster.database.dependencies import Redis
 
-ChatAgent = Annotated[assistant.AgentExecutor, Depends(assistant.get_chat_agent)]
-WhatsAppAgent = Annotated[
-    assistant.AgentExecutor, Depends(assistant.get_whatsapp_chat_agent)
-]
+from . import twilio
+from .assistants.web import get_web_chat_agent
+from .assistants.whatsapp import get_whatsapp_chat_agent
 
-TwilioClient = Annotated[twilio.Client, Depends(twilio.get_twilio_client)]
+
+async def inject_web_chat_agent(user: CurrentUserWS, redis: Redis) -> AgentExecutor:
+    return await get_web_chat_agent(user, redis)
+
+
+ChatAgent = Annotated[AgentExecutor, Depends(inject_web_chat_agent)]
+
+
+async def inject_whatsapp_chat_agent(
+    user: CurrentUserWA, redis: Redis
+) -> AgentExecutor:
+    return await get_whatsapp_chat_agent(user, redis)
+
+
+WhatsAppAgent = Annotated[AgentExecutor, Depends(inject_whatsapp_chat_agent)]
+
+
+async def inject_twilio_client() -> twilio.Client:
+    return twilio.get_twilio_client()
+
+
+TwilioClient = Annotated[twilio.Client, Depends(inject_twilio_client)]
