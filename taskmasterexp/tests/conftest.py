@@ -6,8 +6,11 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from taskmasterexp.ai.assistant import get_whatsapp_chat_agent
-from taskmasterexp.ai.twilio import get_twilio_client
+from taskmasterexp.ai.dependencies import (
+    inject_twilio_client,
+    inject_web_chat_agent,
+    inject_whatsapp_chat_agent,
+)
 from taskmasterexp.app import app
 from taskmasterexp.auth.token import Token, create_access_token
 from taskmasterexp.database.dependencies import inject_db_session
@@ -58,13 +61,17 @@ def test_client(sessionmaker, mock_twilio_client):
     def override_twilio_client():
         return mock_twilio_client
 
-    def override_get_whatsapp_chat_agent():
+    def override_web_chat_agent():
+        return AsyncMock()
+
+    def override_whatsapp_chat_agent():
         return AsyncMock()
 
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
-    app.dependency_overrides[get_twilio_client] = override_twilio_client
-    app.dependency_overrides[get_whatsapp_chat_agent] = override_get_whatsapp_chat_agent
+    app.dependency_overrides[inject_twilio_client] = override_twilio_client
+    app.dependency_overrides[inject_web_chat_agent] = override_web_chat_agent
+    app.dependency_overrides[inject_whatsapp_chat_agent] = override_whatsapp_chat_agent
 
     return TestClient(app)
 
