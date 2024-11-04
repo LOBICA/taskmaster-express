@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from taskmaster.ai.assistant import get_whatsapp_chat_agent
-from taskmaster.ai.history import ChatHistory, get_chat_history_whatsapp
 from taskmaster.ai.twilio import get_twilio_client
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
@@ -55,16 +54,12 @@ def test_client(sessionmaker, mock_twilio_client):
     def override_twilio_client():
         return mock_twilio_client
 
-    def override_chat_history_whatsapp():
-        return ChatHistory(AsyncMock(), "wa:123")
-
     def override_get_whatsapp_chat_agent():
         return AsyncMock()
 
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
     app.dependency_overrides[get_twilio_client] = override_twilio_client
-    app.dependency_overrides[get_chat_history_whatsapp] = override_chat_history_whatsapp
     app.dependency_overrides[get_whatsapp_chat_agent] = override_get_whatsapp_chat_agent
 
     return TestClient(app)
