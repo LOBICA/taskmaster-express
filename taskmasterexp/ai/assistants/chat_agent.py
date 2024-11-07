@@ -3,7 +3,6 @@ from typing import Literal
 
 from langchain.agents import AgentExecutor
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
@@ -12,10 +11,21 @@ from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
 
 from ..checkpoint.redis import AsyncRedisSaver
-from ..client import get_chat_model
+from ..client import get_model_call
 from ..tools import tools
 
 logger = logging.getLogger(__name__)
+
+
+def should_continue(state: MessagesState) -> Literal["tools", END]:
+    messages = state["messages"]
+    last_message = messages[-1]
+    # If the LLM makes a tool call, then we route to the "tools" node
+    if last_message.tool_calls:
+        logger.info("Calling tools")
+        return "tools"
+    # Otherwise, we stop (reply to the user)
+    return END
 
 
 async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
@@ -49,28 +59,9 @@ async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExec
         SystemMessage(email_message),
     ]
 
-    def should_continue(state: MessagesState) -> Literal["tools", END]:
-        messages = state["messages"]
-        last_message = messages[-1]
-        # If the LLM makes a tool call, then we route to the "tools" node
-        if last_message.tool_calls:
-            logger.info("Calling tools")
-            return "tools"
-        # Otherwise, we stop (reply to the user)
-        return END
-
-    async def call_model(state: MessagesState, config: RunnableConfig):
-        model = get_chat_model().bind_tools(tools)
-        messages = state["messages"]
-        response = await model.ainvoke(
-            system_messages + messages,
-            config,
-        )
-        return {"messages": [response]}
-
     workflow = StateGraph(MessagesState)
 
-    workflow.add_node("agent", call_model)
+    workflow.add_node("agent", get_model_call(system_messages, tools))
     workflow.add_node("tools", ToolNode(tools))
 
     workflow.add_edge(START, "agent")
