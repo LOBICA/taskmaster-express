@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from taskmaster.ai.dependencies import (
@@ -11,6 +12,7 @@ from taskmaster.ai.dependencies import (
     inject_web_chat_agent,
     inject_whatsapp_chat_agent,
 )
+from taskmaster.ai.model import ChatModel
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
 from taskmaster.database.dependencies import inject_db_session
@@ -149,3 +151,13 @@ def task_factory(due_date):
         return tasks
 
     return _task_factory
+
+
+@pytest.fixture
+def chat_model_mock():
+    def _chat_model_mock(system_messages, tools):
+        mock = AsyncMock(spec=ChatModel)
+        mock.call.return_value = {"messages": [AIMessage("response")]}
+        return mock
+
+    return _chat_model_mock
