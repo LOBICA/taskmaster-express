@@ -11,7 +11,7 @@ from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
 
 from ..checkpoint.redis import AsyncRedisSaver
-from ..client import get_model_call
+from ..model import ChatModel
 from ..tools import tools
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,8 @@ async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExec
 
     workflow = StateGraph(MessagesState)
 
-    workflow.add_node("agent", get_model_call(system_messages, tools))
+    chat_model = ChatModel(system_messages, tools)
+    workflow.add_node("agent", chat_model.call)
     workflow.add_node("tools", ToolNode(tools))
 
     workflow.add_edge(START, "agent")
