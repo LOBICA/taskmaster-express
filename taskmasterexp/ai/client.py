@@ -1,6 +1,8 @@
 import logging
 
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
+from langgraph.graph import MessagesState
 
 from taskmasterexp.settings import OPENAI_API_KEY, OPENAI_MODEL, OPENAI_TEMPERATURE
 
@@ -13,3 +15,19 @@ def get_chat_model():
         model=OPENAI_MODEL,
         temperature=OPENAI_TEMPERATURE,
     )
+
+
+def get_model_call(system_messages: list, tools: list = []):
+    async def model_call(state: MessagesState, config: RunnableConfig):
+        model = get_chat_model()
+        if tools:
+            model = model.bind_tools(tools)
+
+        messages = state["messages"]
+        response = await model.ainvoke(
+            system_messages + messages,
+            config,
+        )
+        return {"messages": [response]}
+
+    return model_call
