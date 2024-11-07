@@ -69,6 +69,6 @@ async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExec
     workflow.add_conditional_edges("agent", should_continue)
     workflow.add_edge("tools", "agent")
 
-    app = workflow.compile(checkpointer=checkpointer)
+    agent = workflow.compile(checkpointer=checkpointer)
 
-    return app
+    return agent
