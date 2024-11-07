@@ -17,17 +17,20 @@ def get_chat_model():
     )
 
 
-def get_model_call(system_messages: list, tools: list = []):
-    async def model_call(state: MessagesState, config: RunnableConfig):
-        model = get_chat_model()
-        if tools:
-            model = model.bind_tools(tools)
+class ChatModel:
+    def __init__(self, system_messages: list, tools: list = []):
+        self.system_messages = system_messages
+        self.tools = tools
 
+        if tools:
+            self.model = get_chat_model().bind_tools(tools)
+        else:
+            self.model = get_chat_model()
+
+    async def call(self, state: MessagesState, config: RunnableConfig):
         messages = state["messages"]
-        response = await model.ainvoke(
-            system_messages + messages,
+        response = await self.model.ainvoke(
+            self.system_messages + messages,
             config,
         )
         return {"messages": [response]}
-
-    return model_call
