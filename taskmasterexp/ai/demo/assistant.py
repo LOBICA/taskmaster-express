@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 from taskmasterexp.schemas.users import User
 from taskmasterexp.settings import DEMO_TOPIC
 
-from ..client import get_chat_model
+from ..model import get_chat_model
 
 logger = logging.getLogger(__name__)
 
