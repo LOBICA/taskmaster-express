@@ -10,9 +10,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", 60)
 REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv(
     "JWT_REFRESH_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7
 )
-PSQL_CONNECTION_STRING = os.getenv("DATABASE_URL", "").replace(
-    "postgres", "postgresql+asyncpg"
-)
+PSQL_CONNECTION_STRING = os.getenv("DATABASE_URL", "")
 REDIS_URL = os.getenv("REDIS_URL")
 CORS_ORIGINS = [url.strip() for url in os.getenv("CORS_ORIGINS", "").split(",")]
 FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
