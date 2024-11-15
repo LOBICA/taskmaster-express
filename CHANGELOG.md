@@ -2,6 +2,7 @@
 
 ## CURRENT
 * Rename chatbot module to ai
+* Refactor chatbot structure
 
 ## v0.3.0
 * Using langgraph to implement the assistant
