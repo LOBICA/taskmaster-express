@@ -7,7 +7,7 @@ services:
       - 8001:8001
     env_file: .env
     environment:
-      - DATABASE_URL=postgres://taskmaster:password@db/taskmaster
+      - PSQL_CONNECTION_STRING=postgresql+asyncpg://taskmaster:password@db/taskmaster
       - REDIS_URL=redis://redis:6379
       - CORS_ORIGINS=http://localhost:4200,https://taskmaster.local
     command: "sh scripts/launch-api.local.sh"
