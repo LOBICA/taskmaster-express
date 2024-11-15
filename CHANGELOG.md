@@ -2,6 +2,7 @@
 
 ## CURRENT
 * Rename chatbot module to ai
+* Refactor chatbot structure
 
 ## v1.0.0
 * Rename python project
