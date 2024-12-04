@@ -36,15 +36,18 @@ class PaymentPreferencesData(BaseModel):
     payment_failure_threshold: int
 
 
-class SubscriptionPlanData(BaseModel):
+class SubscriptionPlanBase(BaseModel):
     product_id: str
     name: str
     description: str
+
+
+class SubscriptionPlanData(SubscriptionPlanBase):
     billing_cycles: list[BillingCycleData] = []
     payment_preferences: PaymentPreferencesData | None = None
 
 
-class SubscriptionPlan(SubscriptionPlanData):
+class SubscriptionPlan(SubscriptionPlanBase):
     id_: str
     status: str
 
