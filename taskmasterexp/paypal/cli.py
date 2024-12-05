@@ -58,6 +58,6 @@ def add_subscription_plan(
         name=name,
         description=description,
         monthly_price=monthly_price,
-        trial_months=trial_months,
+        trial_months=int(trial_months),
     )
     click.echo(f"Plan added {plan_id}")

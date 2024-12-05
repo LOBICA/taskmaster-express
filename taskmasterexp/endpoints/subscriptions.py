@@ -7,6 +7,7 @@ from taskmasterexp.schemas.subscriptions import (
     SubscriptionPayload,
     SubscriptionResponse,
 )
+from taskmasterexp.settings import PAYPAL_PRODUCT_ID
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
 
@@ -47,3 +48,8 @@ async def cancel_subscription(
     )
     await paypal_client.cancel_subscription(subscription.subscription_id)
     await subscriptions_manager.cancel_subscription(subscription.subscription_id)
+
+
+@router.get("/plans")
+async def get_plans(paypal_client: PayPalClient):
+    return paypal_client.list_subscription_plans(PAYPAL_PRODUCT_ID)
