@@ -131,7 +131,7 @@ async def fb_callback(session: DBSession, request: Request):
     user.fb_access_token = fb_info.token
     await session.commit()
 
-    redirect_url = f"{FB_LOGIN_REDIRECT}?token={user.fb_access_token}"
+    redirect_url = f"{FB_LOGIN_REDIRECT}?fb_token={user.fb_access_token}"
     return RedirectResponse(url=redirect_url)
 
 
