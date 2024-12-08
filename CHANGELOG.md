@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v0.5.0
+* Add facebook redirection on server login
+
 ## v0.4.0
 * Add enpoint to get Paypal subscription plans
 
