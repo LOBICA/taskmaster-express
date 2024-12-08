@@ -10,6 +10,7 @@ from sqlalchemy import select
 
 from taskmasterexp.database.dependencies import DBSession
 from taskmasterexp.database.models import UserModel
+from taskmasterexp.settings import FB_LOGIN_REDIRECT
 
 from .fb import get_authorization_url, get_fb_info, get_fb_info_from_token
 from .token import (
@@ -130,15 +131,8 @@ async def fb_callback(session: DBSession, request: Request):
     user.fb_access_token = fb_info.token
     await session.commit()
 
-    token_data = Token.create_with_username(user.uuid)
-    access_token = create_access_token(token_data)
-    refresh_token = create_refresh_token(token_data)
-
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-    )
+    redirect_url = f"{FB_LOGIN_REDIRECT}?fb_token={user.fb_access_token}"
+    return RedirectResponse(url=redirect_url)
 
 
 @router.post("/fb_login")
