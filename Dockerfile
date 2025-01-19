@@ -1,6 +1,7 @@
 FROM python:3.11 AS base
 
 RUN pip install poetry
+RUN pip install poetry-plugin-export
 WORKDIR /usr/src/app
 
 FROM base AS req

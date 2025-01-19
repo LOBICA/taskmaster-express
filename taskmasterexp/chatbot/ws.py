@@ -40,28 +40,11 @@ async def chat_endpoint(
 ):
     await websocket.accept()
 
-    async for step in agent.astream(
-        {
-            "messages": [HumanMessage("Hello")],
-        },
-        config={
-            "configurable": {"thread_id": str(user.uuid)},
-        },
-        stream_mode="updates",
-    ):
-        logger.info(f"Step: {step}")
-        final_result = step
-
-    logger.info("Finish graph")
-    try:
-        response_message = Message(
-            text=final_result["agent"]["messages"][-1].content,
-            sender="Helper",
-        )
-        await websocket.send_text(response_message.model_dump_json())
-    except Exception as e:
-        logger.exception(e)
-        await websocket.send_text("There was an error")
+    response_message = Message(
+        text="Hello! How can I be of service?",
+        sender="Helper",
+    )
+    await websocket.send_text(response_message.model_dump_json())
 
     while True:
         data = await websocket.receive_text()

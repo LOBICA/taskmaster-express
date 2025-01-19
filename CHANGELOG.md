@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.5.1
+* Add plugin for poetry export for future compatibility
+* Increase TTL for chat history
+
 ## v0.5.0
 * Add facebook redirection on server login
 
