@@ -21,7 +21,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 REDIS_KEY_SEPARATOR = ":"
 
-EXPIRATION_TIME = 60 * 60  # 1 hour
+EXPIRATION_TIME = 24 * 60 * 60  # 24 hours
 
 
 # Utilities used by AsyncRedisSaver
