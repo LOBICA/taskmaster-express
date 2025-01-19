@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## CURRENT
+* Add plugin for poetry export for future compatibility
+
 ## v0.5.0
 * Add facebook redirection on server login
 
