@@ -37,3 +37,12 @@ jobs:
           context: "."
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:stable
+
+      - name: Invoke deployment hook
+        uses: distributhor/workflow-webhook@v3
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}/helpitdone
+          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+          webhook_auth: "${{ secrets.DEPLOY_USER }}:${{ secrets.DEPLOY_PASSWORD }}"
+          timeout: 60
+          max_time: 300
