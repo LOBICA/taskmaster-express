@@ -2,12 +2,14 @@ import logging
 import sys
 
 from fastapi import FastAPI
+from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
 from . import __version__
 from .auth.endpoints import router as auth_endpoints
 from .chatbot import demo, messages, ws
+from .database import ping as database_ping
 from .endpoints import subscriptions, tasks, users
 from .paypal import webhooks
 from .settings import CORS_ORIGINS
@@ -32,7 +34,10 @@ async def root():
 
 @app.get("/ping", response_class=PlainTextResponse)
 async def ping():
-    return "pong"
+    if await database_ping():
+        return "pong"
+    else:
+        raise HTTPException(status_code=500, detail="Database connection failed")
 
 
 app.include_router(auth_endpoints)
