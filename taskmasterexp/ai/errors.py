@@ -1,6 +1,6 @@
-class ChatBotError(Exception):
+class AiAssistantError(Exception):
     """Base class for exceptions in this module."""
 
 
-class MessageTooLongError(ChatBotError):
+class MessageTooLongError(AiAssistantError):
     """Raised when a message exceeds the maximum length."""

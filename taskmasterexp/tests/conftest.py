@@ -4,13 +4,17 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from taskmasterexp.ai.dependencies import (
+    inject_twilio_client,
+    inject_web_chat_agent,
+    inject_whatsapp_chat_agent,
+)
+from taskmasterexp.ai.model import ChatModel
 from taskmasterexp.app import app
 from taskmasterexp.auth.token import Token, create_access_token
-from taskmasterexp.chatbot.assistant import get_whatsapp_chat_agent
-from taskmasterexp.chatbot.history import ChatHistory, get_chat_history_whatsapp
-from taskmasterexp.chatbot.twilio import get_twilio_client
 from taskmasterexp.database.dependencies import inject_db_session
 from taskmasterexp.database.managers import (
     SubscriptionManager,
@@ -59,17 +63,17 @@ def test_client(sessionmaker, mock_twilio_client):
     def override_twilio_client():
         return mock_twilio_client
 
-    def override_chat_history_whatsapp():
-        return ChatHistory(AsyncMock(), "wa:123")
+    def override_web_chat_agent():
+        return AsyncMock()
 
-    def override_get_whatsapp_chat_agent():
+    def override_whatsapp_chat_agent():
         return AsyncMock()
 
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
-    app.dependency_overrides[get_twilio_client] = override_twilio_client
-    app.dependency_overrides[get_chat_history_whatsapp] = override_chat_history_whatsapp
-    app.dependency_overrides[get_whatsapp_chat_agent] = override_get_whatsapp_chat_agent
+    app.dependency_overrides[inject_twilio_client] = override_twilio_client
+    app.dependency_overrides[inject_web_chat_agent] = override_web_chat_agent
+    app.dependency_overrides[inject_whatsapp_chat_agent] = override_whatsapp_chat_agent
 
     return TestClient(app)
 
@@ -127,7 +131,7 @@ def task_manager_generator(db_session):
 @pytest.fixture
 def patch_task_manager(task_manager_generator):
     return patch(
-        "taskmasterexp.chatbot.tools.TaskManager.start_session", task_manager_generator
+        "taskmasterexp.ai.tools.TaskManager.start_session", task_manager_generator
     )
 
 
@@ -151,3 +155,13 @@ def task_factory(due_date):
         return tasks
 
     return _task_factory
+
+
+@pytest.fixture
+def chat_model_mock():
+    def _chat_model_mock(system_messages, tools):
+        mock = AsyncMock(spec=ChatModel)
+        mock.call.return_value = {"messages": [AIMessage("response")]}
+        return mock
+
+    return _chat_model_mock

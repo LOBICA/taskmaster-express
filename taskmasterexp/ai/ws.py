@@ -13,7 +13,7 @@ from .dependencies import ChatAgent
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags="chatbot")
+router = APIRouter(tags="assistant")
 
 
 class Message(BaseModel):
