@@ -176,7 +176,7 @@ class TaskManager(BaseManager):
         stmt = select(TaskModel).where(
             TaskModel.user_id == task.user_id,
             TaskModel.due_date == date,
-            TaskModel.is_main_priority == True,
+            TaskModel.is_main_priority.is_(True),
         )
         result = await self.session.execute(stmt)
         for existing_main_priority in result.scalars():

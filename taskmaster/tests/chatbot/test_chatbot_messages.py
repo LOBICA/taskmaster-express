@@ -10,7 +10,7 @@ TEXT = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer cursu
 Aenean et metus placerat dui consequat scelerisque et id nibh. Ut interdum ante sit amet elit sagittis sollicitudin. Duis in neque vitae odio fringilla elementum eu eget leo. Sed semper eleifend purus, eget mattis massa blandit eu. Suspendisse dapibus felis dignissim tellus ullamcorper, sed accumsan nisi sodales. Sed eget aliquam velit, non auctor nisi. Integer id ornare nisi. Curabitur nisi felis, eleifend porttitor laoreet a, feugiat sed mi. Praesent ligula elit, aliquet nec quam sit amet, lobortis congue dolor. Cras porta massa ac dui auctor, sed ornare enim auctor. Pellentesque at convallis justo, eu faucibus sem. In vulputate imperdiet dolor, vel lacinia dolor faucibus a. Interdum et malesuada fames ac ante ipsum primis in faucibus.
 
 In finibus tellus mi, nec feugiat lacus posuere ut. Curabitur ornare dui erat, vitae suscipit nisi dapibus in. Suspendisse potenti. Nulla euismod eros vel lorem aliquam, eu elementum neque tristique. Ut commodo ipsum eget ipsum pharetra dignissim. In congue metus quis lorem facilisis, a finibus elit tincidunt. Class id.
-"""
+"""  # noqa: E501
 
 
 @patch("taskmaster.ai.messages._send_message")
