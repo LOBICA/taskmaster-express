@@ -7,8 +7,9 @@ from langchain_core.messages import HumanMessage
 
 from taskmasterexp.auth.dependencies import CurrentUserWA
 from taskmasterexp.settings import WHATSAPP_NUMBER
+from taskmasterexp.twilio.dependencies import TwilioClient
 
-from .dependencies import TwilioClient, WhatsAppAgent
+from .dependencies import WhatsAppAgent
 from .errors import MessageTooLongError
 
 logger = logging.getLogger(__name__)
