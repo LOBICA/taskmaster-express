@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 from pytest import raises
 
-from taskmasterexp.ai.errors import MessageTooLongError
-from taskmasterexp.ai.messages import _send_split_message
+from taskmasterexp.twilio.errors import MessageTooLongError
+from taskmasterexp.twilio.utils import send_split_message
 
 TEXT = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer cursus augue quis lorem pretium, non dictum lacus ultricies. Morbi aliquam felis a venenatis imperdiet. Nullam id dapibus eros. Suspendisse eget ipsum iaculis, fringilla tortor et, malesuada arcu. Ut auctor, mauris non blandit fringilla, massa ante mollis metus, ut efficitur nunc elit vel enim. Sed vel fringilla risus, sed finibus quam. Mauris non magna in dui rhoncus consequat id vestibulum augue. In posuere finibus diam nec consectetur. Proin venenatis dictum hendrerit. Fusce accumsan rutrum leo, et venenatis lectus interdum ac. Duis tincidunt imperdiet tellus, id pellentesque ipsum aliquam sit amet. Quisque condimentum augue nec nulla fermentum gravida nec et odio. Pellentesque malesuada neque libero, non vehicula nulla pellentesque at. Aenean ultrices ante a ligula laoreet lacinia. Aenean in tempor massa. Duis gravida nisi vel felis consequat pretium.
 
@@ -13,7 +13,7 @@ In finibus tellus mi, nec feugiat lacus posuere ut. Curabitur ornare dui erat, v
 """  # noqa: E501
 
 
-@patch("taskmasterexp.ai.messages._send_message")
+@patch("taskmasterexp.twilio.utils.send_message")
 async def test_send_split_message(mock_send_message):
     result_text = []
 
@@ -27,20 +27,20 @@ async def test_send_split_message(mock_send_message):
     assert len(TEXT) > 1300
     assert mock_send_message.call_count == 0
 
-    await _send_split_message(None, TEXT, "1234567890")
+    await send_split_message(None, TEXT, "1234567890")
 
     mock_send_message.assert_called()
     assert TEXT == "\n".join(result_text)
     assert mock_send_message.call_count == 2
 
 
-@patch("taskmasterexp.ai.messages._send_message")
+@patch("taskmasterexp.twilio.utils.send_message")
 async def test_send_split_message_long_paragraph(mock_send_message):
     text = "a" * 1400
     assert len(text) > 1300
 
     with raises(MessageTooLongError):
-        await _send_split_message(None, text, "1234567890")
+        await send_split_message(None, text, "1234567890")
 
 
 def test_webhook(test_client, mock_twilio_client):

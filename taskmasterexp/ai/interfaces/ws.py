@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from taskmasterexp.auth.dependencies import CurrentUserWS
 
-from .dependencies import ChatAgent
+from ..dependencies import ChatAgent
 
 logger = logging.getLogger(__name__)
 

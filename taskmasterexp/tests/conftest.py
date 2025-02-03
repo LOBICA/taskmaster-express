@@ -8,7 +8,6 @@ from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from taskmasterexp.ai.dependencies import (
-    inject_twilio_client,
     inject_web_chat_agent,
     inject_whatsapp_chat_agent,
 )
@@ -25,6 +24,7 @@ from taskmasterexp.database.models import BaseModel, UserModel
 from taskmasterexp.paypal.dependencies import inject_paypal_client
 from taskmasterexp.schemas.tasks import Task
 from taskmasterexp.schemas.users import User
+from taskmasterexp.twilio.dependencies import inject_twilio_client
 
 
 @pytest.fixture
