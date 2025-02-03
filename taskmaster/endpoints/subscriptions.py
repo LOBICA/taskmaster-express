@@ -3,10 +3,7 @@ from fastapi import APIRouter, status
 from taskmaster.auth.dependencies import CurrentUser
 from taskmaster.database.dependencies import SubscriptionManager
 from taskmaster.paypal.dependencies import PayPalClient
-from taskmaster.schemas.subscriptions import (
-    SubscriptionPayload,
-    SubscriptionResponse,
-)
+from taskmaster.schemas.subscriptions import SubscriptionPayload, SubscriptionResponse
 from taskmaster.settings import PAYPAL_PRODUCT_ID
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])

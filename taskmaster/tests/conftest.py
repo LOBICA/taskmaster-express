@@ -12,11 +12,7 @@ from taskmaster.chatbot.assistant import get_whatsapp_chat_agent
 from taskmaster.chatbot.history import ChatHistory, get_chat_history_whatsapp
 from taskmaster.chatbot.twilio import get_twilio_client
 from taskmaster.database.dependencies import inject_db_session
-from taskmaster.database.managers import (
-    SubscriptionManager,
-    TaskManager,
-    UserManager,
-)
+from taskmaster.database.managers import SubscriptionManager, TaskManager, UserManager
 from taskmaster.database.models import BaseModel, UserModel
 from taskmaster.paypal.dependencies import inject_paypal_client
 from taskmaster.schemas.tasks import Task
