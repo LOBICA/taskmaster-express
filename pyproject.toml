@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "taskmasterexp"
+name = "taskmaster"
 version = "0.5.1"
 description = ""
 authors = ["Andres Javier Lopez <code@andresjavierlopez.com>"]
 readme = "README.md"
-packages = [{include = "taskmasterexp"}]
+packages = [{include = "taskmaster"}]
 
 
 [tool.poetry.dependencies]
