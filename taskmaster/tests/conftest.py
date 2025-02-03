@@ -7,11 +7,7 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from taskmaster.ai.dependencies import (
-    inject_twilio_client,
-    inject_web_chat_agent,
-    inject_whatsapp_chat_agent,
-)
+from taskmaster.ai.dependencies import inject_web_chat_agent, inject_whatsapp_chat_agent
 from taskmaster.ai.model import ChatModel
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
@@ -21,6 +17,7 @@ from taskmaster.database.models import BaseModel, UserModel
 from taskmaster.paypal.dependencies import inject_paypal_client
 from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
+from taskmaster.twilio.dependencies import inject_twilio_client
 
 
 @pytest.fixture

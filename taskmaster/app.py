@@ -5,11 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
-from . import __version__
-from .ai import demo, messages, ws
+from . import __version__, ai, paypal
 from .auth.endpoints import router as auth_endpoints
 from .endpoints import subscriptions, tasks, users
-from .paypal import webhooks
 from .settings import CORS_ORIGINS, FASTAPI_DOCUMENTATION
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -51,7 +49,9 @@ app.include_router(auth_endpoints)
 app.include_router(users.router)
 app.include_router(tasks.router)
 app.include_router(subscriptions.router)
-app.include_router(ws.router)
-app.include_router(messages.router)
-app.include_router(webhooks.router)
-app.include_router(demo.router)
+
+app.include_router(paypal.webhooks.router)
+
+app.include_router(ai.ws.router)
+app.include_router(ai.webhooks.router)
+app.include_router(ai.demo.router)
