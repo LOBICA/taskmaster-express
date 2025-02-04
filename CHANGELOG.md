@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## CURRENT
+## v1.0.0
 * Rename python project
 
 ## v0.5.1
