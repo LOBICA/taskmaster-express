@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "taskmasterexp"
-version = "0.5.1"
+name = "taskmaster"
+version = "1.0.0"
 description = ""
 authors = ["Andres Javier Lopez <code@andresjavierlopez.com>"]
 readme = "README.md"
-packages = [{include = "taskmasterexp"}]
+packages = [{include = "taskmaster"}]
 
 
 [tool.poetry.dependencies]
@@ -47,9 +47,9 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov=taskmasterexp"
-testpaths = "taskmasterexp"
+addopts = "--cov=taskmaster"
+testpaths = "taskmaster"
 asyncio_mode = "auto"
 
 [tool.coverage.run]
-omit = [ "taskmasterexp/tests/*" ]
+omit = [ "taskmaster/tests/*" ]

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.0.0
+* Rename python project
+
 ## v0.5.1
 * Add plugin for poetry export for future compatibility
 * Increase TTL for chat history
