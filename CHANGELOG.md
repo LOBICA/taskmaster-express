@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## CURRENT
+
+## v1.1.0
 * Rename chatbot module to ai
 * Refactor chatbot structure
 
