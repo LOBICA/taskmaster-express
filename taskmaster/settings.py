@@ -12,6 +12,7 @@ REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv(
 )
 PSQL_CONNECTION_STRING = os.getenv("PSQL_CONNECTION_STRING")
 REDIS_URL = os.getenv("REDIS_URL")
+FASTAPI_DOCUMENTATION = os.getenv("FASTAPI_DOCUMENTATION", "false").lower() == "true"
 CORS_ORIGINS = [url.strip() for url in os.getenv("CORS_ORIGINS", "").split(",")]
 FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
 FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")

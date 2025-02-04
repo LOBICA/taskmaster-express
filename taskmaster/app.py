@@ -10,11 +10,23 @@ from .auth.endpoints import router as auth_endpoints
 from .chatbot import demo, messages, ws
 from .endpoints import subscriptions, tasks, users
 from .paypal import webhooks
-from .settings import CORS_ORIGINS
+from .settings import CORS_ORIGINS, FASTAPI_DOCUMENTATION
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-app = FastAPI(title="Taskmaster Express", version=__version__)
+if FASTAPI_DOCUMENTATION:
+    docs_url = "/docs"
+    redoc_url = "/redoc"
+else:
+    docs_url = None
+    redoc_url = None
+
+app = FastAPI(
+    title="Taskmaster Express",
+    version=__version__,
+    docs_url=docs_url,
+    redoc_url=redoc_url,
+)
 
 app.add_middleware(
     CORSMiddleware,
