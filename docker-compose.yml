@@ -9,6 +9,7 @@ services:
     environment:
       - PSQL_CONNECTION_STRING=postgresql+asyncpg://taskmaster:password@db/taskmaster
       - REDIS_URL=redis://redis:6379
+      - FASTAPI_DOCUMENTATION=true
       - CORS_ORIGINS=http://localhost:4200,https://taskmaster.local
     command: "sh scripts/launch-api.local.sh"
     volumes:
