@@ -47,9 +47,9 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov=taskmasterexp"
-testpaths = "taskmasterexp"
+addopts = "--cov=taskmaster"
+testpaths = "taskmaster"
 asyncio_mode = "auto"
 
 [tool.coverage.run]
-omit = [ "taskmasterexp/tests/*" ]
+omit = [ "taskmaster/tests/*" ]
