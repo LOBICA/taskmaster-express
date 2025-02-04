@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 from taskmaster.schemas.users import User
 from taskmaster.settings import DEMO_TOPIC
 
-from ..client import get_chat_model
+from ..model import get_chat_model
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ async def get_demo_chat_agent(user: User) -> AgentExecutor:
         ("system", "You are a helpful assistant"),
         (
             "system",
-            "You are doing a demo for the user and you will tell them that this is a demo",
+            "You are doing a demo for the user and you will tell them that this is a demo",  # noqa: E501
         ),
         ("human", f"My name is {user.name}"),
         ("system", f"You are an expert on {DEMO_TOPIC}"),

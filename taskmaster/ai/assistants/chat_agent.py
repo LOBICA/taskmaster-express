@@ -3,26 +3,32 @@ from typing import Literal
 
 from langchain.agents import AgentExecutor
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
-from taskmaster.auth.dependencies import CurrentUserWA, CurrentUserWS
-from taskmaster.database.dependencies import Redis
 from taskmaster.helpers import get_current_time, get_weekday
 from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
-from taskmaster.settings import DEMO_PHONE_NUMBERS
 
-from .checkpoint.redis import AsyncRedisSaver
-from .client import get_chat_model
-from .demo import get_demo_chat_agent
-from .tools import tools
+from ..checkpoint.redis import AsyncRedisSaver
+from ..model import ChatModel
+from ..tools import tools
 
 logger = logging.getLogger(__name__)
 
 
-async def _get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
+def should_continue(state: MessagesState) -> Literal["tools", END]:
+    messages = state["messages"]
+    last_message = messages[-1]
+    # If the LLM makes a tool call, then we route to the "tools" node
+    if last_message.tool_calls:
+        logger.info("Calling tools")
+        return "tools"
+    # Otherwise, we stop (reply to the user)
+    return END
+
+
+async def get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExecutor:
     task_template = "[title]\n[description]\nStatus: [status]\n"
 
     if not user.email:
@@ -53,50 +59,16 @@ async def _get_chat_agent(user: User, checkpointer: AsyncRedisSaver) -> AgentExe
         SystemMessage(email_message),
     ]
 
-    def should_continue(state: MessagesState) -> Literal["tools", END]:
-        messages = state["messages"]
-        last_message = messages[-1]
-        # If the LLM makes a tool call, then we route to the "tools" node
-        if last_message.tool_calls:
-            logger.info("Calling tools")
-            return "tools"
-        # Otherwise, we stop (reply to the user)
-        return END
-
-    async def call_model(state: MessagesState, config: RunnableConfig):
-        model = get_chat_model().bind_tools(tools)
-        messages = state["messages"]
-        response = await model.ainvoke(
-            system_messages + messages,
-            config,
-        )
-        return {"messages": [response]}
-
     workflow = StateGraph(MessagesState)
 
-    workflow.add_node("agent", call_model)
+    chat_model = ChatModel(system_messages, tools)
+    workflow.add_node("agent", chat_model.call)
     workflow.add_node("tools", ToolNode(tools))
 
     workflow.add_edge(START, "agent")
     workflow.add_conditional_edges("agent", should_continue)
     workflow.add_edge("tools", "agent")
 
-    app = workflow.compile(checkpointer=checkpointer)
+    agent = workflow.compile(checkpointer=checkpointer)
 
-    return app
-
-
-async def get_chat_agent(
-    user: CurrentUserWS,
-    redis: Redis,
-) -> AgentExecutor:
-    return await _get_chat_agent(user, AsyncRedisSaver(redis))
-
-
-async def get_whatsapp_chat_agent(
-    user: CurrentUserWA,
-    redis: Redis,
-) -> AgentExecutor:
-    if user.phone_number in DEMO_PHONE_NUMBERS:
-        return await get_demo_chat_agent(user)
-    return await _get_chat_agent(user, AsyncRedisSaver(redis))
+    return agent

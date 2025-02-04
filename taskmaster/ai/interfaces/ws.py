@@ -9,11 +9,11 @@ from pydantic import BaseModel, Field, ValidationError
 
 from taskmaster.auth.dependencies import CurrentUserWS
 
-from .dependencies import ChatAgent
+from ..dependencies import ChatAgent
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags="chatbot")
+router = APIRouter(tags="assistant")
 
 
 class Message(BaseModel):

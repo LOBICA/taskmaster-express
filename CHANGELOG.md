@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## CURRENT
+
+## v1.1.0
+* Rename chatbot module to ai
+* Refactor chatbot structure
+
 ## v1.0.0
 * Rename python project
 

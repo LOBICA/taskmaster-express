@@ -4,19 +4,20 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from taskmaster.ai.dependencies import inject_web_chat_agent, inject_whatsapp_chat_agent
+from taskmaster.ai.model import ChatModel
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
-from taskmaster.chatbot.assistant import get_whatsapp_chat_agent
-from taskmaster.chatbot.history import ChatHistory, get_chat_history_whatsapp
-from taskmaster.chatbot.twilio import get_twilio_client
 from taskmaster.database.dependencies import inject_db_session
 from taskmaster.database.managers import SubscriptionManager, TaskManager, UserManager
 from taskmaster.database.models import BaseModel, UserModel
 from taskmaster.paypal.dependencies import inject_paypal_client
 from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
+from taskmaster.twilio.dependencies import inject_twilio_client
 
 
 @pytest.fixture
@@ -55,17 +56,17 @@ def test_client(sessionmaker, mock_twilio_client):
     def override_twilio_client():
         return mock_twilio_client
 
-    def override_chat_history_whatsapp():
-        return ChatHistory(AsyncMock(), "wa:123")
+    def override_web_chat_agent():
+        return AsyncMock()
 
-    def override_get_whatsapp_chat_agent():
+    def override_whatsapp_chat_agent():
         return AsyncMock()
 
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
-    app.dependency_overrides[get_twilio_client] = override_twilio_client
-    app.dependency_overrides[get_chat_history_whatsapp] = override_chat_history_whatsapp
-    app.dependency_overrides[get_whatsapp_chat_agent] = override_get_whatsapp_chat_agent
+    app.dependency_overrides[inject_twilio_client] = override_twilio_client
+    app.dependency_overrides[inject_web_chat_agent] = override_web_chat_agent
+    app.dependency_overrides[inject_whatsapp_chat_agent] = override_whatsapp_chat_agent
 
     return TestClient(app)
 
@@ -123,7 +124,7 @@ def task_manager_generator(db_session):
 @pytest.fixture
 def patch_task_manager(task_manager_generator):
     return patch(
-        "taskmaster.chatbot.tools.TaskManager.start_session", task_manager_generator
+        "taskmaster.ai.tools.TaskManager.start_session", task_manager_generator
     )
 
 
@@ -147,3 +148,13 @@ def task_factory(due_date):
         return tasks
 
     return _task_factory
+
+
+@pytest.fixture
+def chat_model_mock():
+    def _chat_model_mock(system_messages, tools):
+        mock = AsyncMock(spec=ChatModel)
+        mock.call.return_value = {"messages": [AIMessage("response")]}
+        return mock
+
+    return _chat_model_mock
