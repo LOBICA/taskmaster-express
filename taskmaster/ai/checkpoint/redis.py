@@ -3,6 +3,7 @@
 Based on the example in
 https://langchain-ai.github.io/langgraph/how-tos/persistence_redis/
 """
+
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, AsyncIterator, List, Optional, Tuple
 
@@ -232,9 +233,9 @@ class AsyncRedisSaver(BaseCheckpointSaver):
             "type": type_,
             "checkpoint_id": checkpoint_id,
             "metadata": serialized_metadata,
-            "parent_checkpoint_id": parent_checkpoint_id
-            if parent_checkpoint_id
-            else "",
+            "parent_checkpoint_id": (
+                parent_checkpoint_id if parent_checkpoint_id else ""
+            ),
         }
 
         await self.conn.hset(key, mapping=data)
