@@ -1,4 +1,5 @@
 """Define the dependencies injected into the FastAPI endpoints."""
+
 from typing import Annotated
 
 from fastapi import Depends
