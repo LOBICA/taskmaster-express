@@ -2,6 +2,11 @@
 
 ## CURRENT
 
+## v1.1.1
+* Update dependencies
+* Fix issue with empty due dates
+* Add ConfigDict to Pydantic models
+
 ## v1.1.0
 * Rename chatbot module to ai
 * Refactor chatbot structure

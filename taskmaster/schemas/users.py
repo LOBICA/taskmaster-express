@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserData(BaseModel):
@@ -12,8 +12,7 @@ class UserData(BaseModel):
 class User(UserData):
     uuid: UUID | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserRegisterInput(UserData):

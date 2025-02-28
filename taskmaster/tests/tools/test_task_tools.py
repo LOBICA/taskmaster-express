@@ -85,6 +85,23 @@ async def test_add_new_task_tool(
             {
                 "user_id": str(test_admin_user.uuid),
                 "title": title,
+                "description": "",
+                "due_date": "",
+            }
+        )
+        task_id, *_ = task_details.split(" | ")
+
+    task = await task_manager.get(UUID(task_id))
+    assert task.title == title
+    assert task.description == ""
+    assert task.due_date is None
+    assert task.ai_format() == task_details
+
+    with patch_task_manager:
+        task_details: str = await add_new_task.ainvoke(
+            {
+                "user_id": str(test_admin_user.uuid),
+                "title": title,
                 "description": description,
                 "due_date": due_date,
             }

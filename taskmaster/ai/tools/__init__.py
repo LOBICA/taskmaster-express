@@ -88,6 +88,8 @@ async def add_new_task(
         try:
             if due_date:
                 due_date = datetime.datetime.fromisoformat(due_date).date()
+            else:
+                due_date = None
 
             task = Task(
                 user_id=UUID(user_id),
