@@ -20,6 +20,7 @@ cli.add_command(paypal_cli.add_subscription_plan)
 
 cli.add_command(auth_cli.add_user)
 cli.add_command(auth_cli.change_user_password)
+cli.add_command(auth_cli.generate_app_token)
 
 
 if __name__ == "__main__":

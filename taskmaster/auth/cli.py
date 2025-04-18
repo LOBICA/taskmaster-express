@@ -1,8 +1,10 @@
 import asyncio
+from datetime import timedelta
 from uuid import UUID
 
 import click
 
+from taskmaster.auth.token import Token, create_refresh_token
 from taskmaster.database.managers import UserManager
 from taskmaster.schemas.users import User
 
@@ -34,3 +36,14 @@ def change_user_password(user_id):
     password = click.prompt("Password", hide_input=True)
     asyncio.run(_change_password(user_id, password))
     click.echo(f"Password for user {user_id} changed")
+
+
+@click.command()
+@click.option("--app-name", prompt="App name")
+def generate_app_token(app_name):
+    token = Token.create_with_username(app_name)
+    refresh_token = create_refresh_token(
+        token,
+        expires_delta=timedelta(days=60),
+    )
+    click.echo(f"App token for {app_name}: {refresh_token}")
