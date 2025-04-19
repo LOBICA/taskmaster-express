@@ -85,3 +85,14 @@ def create_refresh_token(data: Token, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire, "scope": scope})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def create_app_token(data: Token):
+    """Create an app token that doesn't expire"""
+    to_encode = data.model_dump(exclude={"scopes"})
+    scopes = data.scopes.copy()
+    scopes.extend(["refresh-token", "app-token"])
+    scope = " ".join(scopes)
+    to_encode.update({"scope": scope})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt

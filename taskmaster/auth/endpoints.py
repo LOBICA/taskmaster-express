@@ -126,11 +126,10 @@ async def get_app_token(refresh_token_input: RefreshTokenInput):
     token_data = Token.create_with_username(token.username)
     token_data.scopes = ["app-token"]
     access_token = create_access_token(token_data, fresh=False)
-    refresh_token = create_refresh_token(token_data)
 
     return TokenResponse(
         access_token=access_token,
-        refresh_token=refresh_token,
+        refresh_token=None,
         token_type="bearer",
     )
 
@@ -152,6 +151,10 @@ async def get_user_token_with_app_token_and_phone_number(
         raise credentials_exception
 
     if "app-token" not in app_token.scopes:
+        raise credentials_exception
+
+    if "refresh-token" in app_token.scopes:
+        # Don't allow refresh token to be used
         raise credentials_exception
 
     stmt = select(UserModel).where(

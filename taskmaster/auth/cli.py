@@ -4,7 +4,7 @@ from uuid import UUID
 
 import click
 
-from taskmaster.auth.token import Token, create_refresh_token
+from taskmaster.auth.token import Token, create_app_token
 from taskmaster.database.managers import UserManager
 from taskmaster.schemas.users import User
 
@@ -42,9 +42,7 @@ def change_user_password(user_id):
 @click.option("--app-name", prompt="App name")
 def generate_app_token(app_name):
     token = Token.create_with_username(app_name)
-    token.scopes = ["app-token"]
-    refresh_token = create_refresh_token(
+    refresh_token = create_app_token(
         token,
-        expires_delta=timedelta(days=60),
     )
     click.echo(f"App token for {app_name}: {refresh_token}")
