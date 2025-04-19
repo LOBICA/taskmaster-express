@@ -46,6 +46,7 @@ class RefreshTokenInput(BaseModel):
 class PhoneTokenInput(BaseModel):
     app_token: str = Field(alias="appToken")
     phone_number: str = Field(alias="phoneNumber")
+    username: str
 
 
 class TokenResponse(BaseModel):

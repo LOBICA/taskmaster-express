@@ -161,7 +161,14 @@ async def get_user_token_with_app_token_and_phone_number(
     user = results.scalar_one_or_none()
 
     if not user:
-        raise credentials_exception
+        # If user does not exists, let's create one with this phone number
+        user = UserModel(
+            name=phone_token_input.username,
+            phone_number=phone_token_input.phone_number,
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
 
     if user.disabled:
         raise credentials_exception
