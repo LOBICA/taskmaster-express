@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## CURRENT
+* Add app token validation
 
 ## v1.1.1
 * Update dependencies
