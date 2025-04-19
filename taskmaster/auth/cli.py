@@ -42,6 +42,7 @@ def change_user_password(user_id):
 @click.option("--app-name", prompt="App name")
 def generate_app_token(app_name):
     token = Token.create_with_username(app_name)
+    token.scopes = ["app-token"]
     refresh_token = create_refresh_token(
         token,
         expires_delta=timedelta(days=60),

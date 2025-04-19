@@ -15,6 +15,7 @@ from taskmaster.settings import FB_LOGIN_REDIRECT
 from .fb import get_authorization_url, get_fb_info, get_fb_info_from_token
 from .token import (
     AccessTokenInput,
+    PhoneTokenInput,
     RefreshTokenInput,
     Token,
     TokenResponse,
@@ -97,6 +98,81 @@ async def refresh_authentication_token(
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
+        token_type="bearer",
+    )
+
+
+@router.post("/app-token/refresh", response_model=TokenResponse)
+async def get_app_token(refresh_token_input: RefreshTokenInput):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    refresh_token = refresh_token_input.refresh_token
+
+    try:
+        token = Token.decode_token(refresh_token)
+    except InvalidTokenError:
+        raise credentials_exception
+
+    if "app-token" not in token.scopes:
+        raise credentials_exception
+
+    if "refresh-token" not in token.scopes:
+        raise credentials_exception
+
+    token_data = Token.create_with_username(token.username)
+    token_data.scopes = ["app-token"]
+    access_token = create_access_token(token_data, fresh=False)
+    refresh_token = create_refresh_token(token_data)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+    )
+
+
+@router.post("/app-token/user_phone")
+async def get_user_token_with_app_token_and_phone_number(
+    session: DBSession,
+    phone_token_input: PhoneTokenInput,
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        app_token = Token.decode_token(phone_token_input.app_token)
+    except InvalidTokenError:
+        raise credentials_exception
+
+    if "app-token" not in app_token.scopes:
+        raise credentials_exception
+
+    stmt = select(UserModel).where(
+        UserModel.phone_number == phone_token_input.phone_number
+    )
+    results = await session.execute(stmt)
+    user = results.scalar_one_or_none()
+
+    if not user:
+        raise credentials_exception
+
+    if user.disabled:
+        raise credentials_exception
+
+    token = Token.create_with_username(user.uuid)
+    token.scopes = [app_token.username]
+    access_token = create_access_token(token, fresh=False)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=None,
         token_type="bearer",
     )
 
