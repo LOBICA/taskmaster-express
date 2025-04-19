@@ -2,6 +2,9 @@
 
 ## CURRENT
 
+## v1.2.0
+* Add app token validation
+
 ## v1.1.1
 * Update dependencies
 * Fix issue with empty due dates
