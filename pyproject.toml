@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "taskmaster"
-version = "1.2.0"
+version = "1.2.1"
 description = ""
 authors = ["Andres Javier Lopez <code@andresjavierlopez.com>"]
 readme = "README.md"
