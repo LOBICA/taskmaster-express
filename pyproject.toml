@@ -29,6 +29,7 @@ click = "^8.1.7"
 twilio = "^9.2.2"
 redis = "^5.0.7"
 langgraph = "^0.2.38"
+httpcore = "^1.0.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
