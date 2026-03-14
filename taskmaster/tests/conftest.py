@@ -1,14 +1,10 @@
-from contextlib import asynccontextmanager
 from datetime import date
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
-from langchain_core.messages import AIMessage
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from taskmaster.ai.dependencies import inject_web_chat_agent, inject_whatsapp_chat_agent
-from taskmaster.ai.model import ChatModel
 from taskmaster.app import app
 from taskmaster.auth.token import Token, create_access_token
 from taskmaster.database.dependencies import inject_db_session
@@ -17,7 +13,6 @@ from taskmaster.database.models import BaseModel, UserModel
 from taskmaster.paypal.dependencies import inject_paypal_client
 from taskmaster.schemas.tasks import Task
 from taskmaster.schemas.users import User
-from taskmaster.twilio.dependencies import inject_twilio_client
 
 
 @pytest.fixture
@@ -40,12 +35,7 @@ async def db_session(sessionmaker):
 
 
 @pytest.fixture
-def mock_twilio_client():
-    return Mock()
-
-
-@pytest.fixture
-def test_client(sessionmaker, mock_twilio_client):
+def test_client(sessionmaker):
     async def override_db_session():
         async with sessionmaker() as session:
             yield session
@@ -53,20 +43,8 @@ def test_client(sessionmaker, mock_twilio_client):
     def override_paypal_client():
         return AsyncMock()
 
-    def override_twilio_client():
-        return mock_twilio_client
-
-    def override_web_chat_agent():
-        return AsyncMock()
-
-    def override_whatsapp_chat_agent():
-        return AsyncMock()
-
     app.dependency_overrides[inject_db_session] = override_db_session
     app.dependency_overrides[inject_paypal_client] = override_paypal_client
-    app.dependency_overrides[inject_twilio_client] = override_twilio_client
-    app.dependency_overrides[inject_web_chat_agent] = override_web_chat_agent
-    app.dependency_overrides[inject_whatsapp_chat_agent] = override_whatsapp_chat_agent
 
     return TestClient(app)
 
@@ -114,21 +92,6 @@ def subscription_manager(db_session):
 
 
 @pytest.fixture
-def task_manager_generator(db_session):
-    async def _task_manager_generator():
-        yield TaskManager(db_session)
-
-    return asynccontextmanager(_task_manager_generator)
-
-
-@pytest.fixture
-def patch_task_manager(task_manager_generator):
-    return patch(
-        "taskmaster.ai.tools.TaskManager.start_session", task_manager_generator
-    )
-
-
-@pytest.fixture
 def due_date():
     return date.today().isoformat()
 
@@ -148,13 +111,3 @@ def task_factory(due_date):
         return tasks
 
     return _task_factory
-
-
-@pytest.fixture
-def chat_model_mock():
-    def _chat_model_mock(system_messages, tools):
-        mock = AsyncMock(spec=ChatModel)
-        mock.call.return_value = {"messages": [AIMessage("response")]}
-        return mock
-
-    return _chat_model_mock

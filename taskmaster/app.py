@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
-from . import __version__, ai, paypal
+from . import __version__, paypal
 from .auth.endpoints import router as auth_endpoints
 from .endpoints import subscriptions, tasks, users
 from .settings import CORS_ORIGINS, FASTAPI_DOCUMENTATION
@@ -51,7 +51,3 @@ app.include_router(tasks.router)
 app.include_router(subscriptions.router)
 
 app.include_router(paypal.webhooks.router)
-
-app.include_router(ai.ws.router)
-app.include_router(ai.webhooks.router)
-app.include_router(ai.demo.router)
