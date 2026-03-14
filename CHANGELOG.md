@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## CURRENT
+* Update dependencies
 
 ## v1.2.2
 * Update dependencies
