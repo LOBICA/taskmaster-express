@@ -40,8 +40,8 @@ async def test_add_task(test_admin_client, test_admin_user, task_factory):
     assert response.json() == []
 
     task, *_ = task_factory(test_admin_user)
-    response = test_admin_client.post("/tasks", content=task.to_json())
-    assert response.status_code == 201
+    response = test_admin_client.post("/tasks", json=task.model_dump(mode="json"))
+    assert response.status_code == 201, response.text
     task_response = response.json()
     assert task_response["title"] == task.title
 
@@ -71,14 +71,16 @@ async def test_patch_task(
     task_data, *_ = task_factory(test_admin_user)
 
     uuid = uuid4()
-    response = test_admin_client.patch(f"/tasks/{uuid}", content=task_data.to_json())
-    assert response.status_code == 404
+    response = test_admin_client.patch(
+        f"/tasks/{uuid}", json=task_data.model_dump(mode="json")
+    )
+    assert response.status_code == 404, response.text
 
     task = await task_manager.save(task_data)
 
     task_data.title = "updated title"
     response = test_admin_client.patch(
-        f"/tasks/{task.uuid}", content=task_data.to_json()
+        f"/tasks/{task.uuid}", json=task_data.model_dump(mode="json")
     )
     assert response.status_code == 200
     task_response = response.json()
