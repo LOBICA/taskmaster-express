@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## CURRENT
+* Remove old AI modules not required anymore
+* Remove Twilio dependencies
 * Update dependencies
 
 ## v1.2.2
